@@ -1,0 +1,89 @@
+.pagination-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+.pagination-info input {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 0.6rem;
+  background-color: #428257;
+  color: #ffb9a7;
+}
+
+.pagination-info p span {
+  font-weight: 700;
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  justify-content: center;
+}
+
+.empty {
+  grid-column: -1/1;
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 2rem 0rem;
+}
+
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  margin: 20px 0px;
+}
+
+.pagination-buttons button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 0.6rem;
+  background-color: #428257;
+  color: #ffb9a7;
+  transition: all 0.3s ease;
+}
+
+.pagination-buttons button[disabled] {
+  background-color: #3a8854b1;
+  cursor: default;
+}
+
+.pagination-buttons button:hover {
+  background-color: #4f9165;
+}
+
+.pagination-buttons p span {
+  font-weight: 700;
+}
+
+@media (max-width: 1300px) {
+  .books-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .books-grid {
+    grid-template-columns: repeat(1, 80%);
+  }
+}
+
+@media (max-width: 640px) {
+  .books-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .pagination-info input {
+    padding: 10px 10px;
+    width: 200px;
+  }
+}

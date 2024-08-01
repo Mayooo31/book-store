@@ -1,0 +1,48 @@
+<h1 class="title">Choose your favourite book...</h1>
+
+<div class="pagination-info">
+  <form [formGroup]="searchForm">
+    <input
+      placeholder="Search your book..."
+      name="search"
+      id="search"
+      formControlName="search"
+    />
+  </form>
+  <p>
+    Total Books: <span>{{ paginationInfo().totalBooks }}</span>
+  </p>
+  @if(paginationInfo().totalBooks){ }
+</div>
+
+@if(loading()){
+<p class="main-loading">Loading...</p>
+}
+<!--  -->
+@else if(error()){
+<p class="main-error">{{ error() }}</p>
+}
+<!--  -->
+@else {
+<div class="books-grid">
+  @for(book of books(); track book.id){
+  <app-book-item [book]="book" />
+  } @empty {
+  <p class="empty">No books here... Sorry... 😯</p>
+  }
+</div>
+
+<div class="pagination-buttons">
+  <button (click)="prevPage()" [disabled]="page() === 1">Previous</button>
+  <p>
+    Page <span>{{ paginationInfo().currentPage }}</span> of
+    <span>{{ paginationInfo().totalPages }}</span>
+  </p>
+  <button
+    (click)="nextPage()"
+    [disabled]="page() === paginationInfo().totalPages"
+  >
+    Next
+  </button>
+</div>
+}

@@ -1,0 +1,45 @@
+<header [class.open]="isOpenNavbar()">
+  <nav class="navbar">
+    <ul>
+      <li>
+        <a
+          closeNavbar
+          routerLink="/dashboard/manage-books"
+          routerLinkActive="active"
+          >Manage books</a
+        >
+      </li>
+      <li>
+        <a
+          closeNavbar
+          routerLink="/dashboard/add-book"
+          routerLinkActive="active"
+          >Add book</a
+        >
+      </li>
+    </ul>
+  </nav>
+  <div>
+    <h1>Dashboard</h1>
+  </div>
+  <nav class="navbar">
+    <ul>
+      <li>
+        <a
+          closeNavbar
+          routerLink="/dashboard"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          >Overview</a
+        >
+      </li>
+      <li>
+        <a closeNavbar routerLink="/books">Home</a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<div class="hamburger" (click)="onToggleNavbar()">
+  <span class="material-symbols-outlined"> menu </span>
+</div>

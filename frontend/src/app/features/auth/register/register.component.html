@@ -1,0 +1,8 @@
+<app-shared-auth-form
+  [form]="form"
+  [title]="'Register'"
+  [error]="error()"
+  [loading]="loading()"
+  [formControls]="['name', 'email', 'password']"
+  (formSubmit)="onSubmit()"
+></app-shared-auth-form>

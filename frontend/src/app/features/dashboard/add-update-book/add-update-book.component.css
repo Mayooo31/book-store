@@ -1,0 +1,166 @@
+form {
+  max-width: 500px;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.1rem;
+}
+
+.genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.genre-item {
+  cursor: pointer;
+  background: #428257;
+  color: #ffb9a7;
+  border-radius: 0.4rem;
+  padding: 0.5rem;
+  font-weight: 600;
+  border: 2px solid #ffb9a7;
+  flex: 1;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+.genre-item:hover {
+  background: #509a68;
+}
+
+.genre-item.selected-genre {
+  background: #ffb9a7;
+  color: #428257;
+}
+
+form input,
+form textarea {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+form input,
+form button,
+form textarea {
+  background: #ffb9a7;
+  color: #428257;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+}
+
+textarea {
+  min-height: 100px;
+}
+
+form label {
+  text-align: left;
+}
+
+form button {
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid #ffb9a7;
+}
+
+form button:hover {
+  background: #f4ad9b;
+}
+
+form button:active {
+  background-color: #428257;
+  color: #ffb9a7;
+}
+
+.error {
+  color: #ed7c74;
+  text-align: left;
+  font-size: 1rem;
+}
+
+form div:has(.ng-invalid.ng-touched.ng-dirty) label {
+  color: #ed7c74;
+}
+
+input.ng-invalid.ng-touched.ng-dirty,
+textarea.ng-invalid.ng-touched.ng-dirty {
+  background-color: #ed7c74;
+}
+
+/* CUSTOM CHECKBOX */
+
+/* Customize the label (the container) */
+.container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  /* background-color: #eee; */
+  border-radius: 0.3rem;
+  background: #ffb9a7;
+}
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+/* When the checkbox is checked, add a green background */
+.container input:checked ~ .checkmark {
+  background-color: #0fa954;
+}
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+.checkbox {
+  margin-bottom: 0.6rem;
+}
+
+/* //////////////////////////// */
+@media (max-width: 640px) {
+  form {
+    max-width: 95%;
+  }
+}

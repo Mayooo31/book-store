@@ -1,0 +1,8 @@
+<app-shared-auth-form
+  [form]="form"
+  [title]="'Login'"
+  [error]="error()"
+  [loading]="loading()"
+  [formControls]="['email', 'password']"
+  (formSubmit)="onSubmit()"
+></app-shared-auth-form>

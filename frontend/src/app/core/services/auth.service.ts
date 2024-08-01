@@ -1,0 +1,121 @@
+import { inject, Injectable, Injector } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
+import { CartService } from './cart.service';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+  private apiUrl = `${environment.apiUrl}/auth`;
+  private http = inject(HttpClient);
+  private cookieService = inject(CookieService);
+  private router = inject(Router);
+  private injector = inject(Injector);
+
+  // using injector because two services uses each other and that can cause loop
+  private _cartService?: CartService;
+  private get cartService(): CartService {
+    if (!this._cartService) {
+      this._cartService = this.injector.get(CartService);
+    }
+    return this._cartService;
+  }
+
+  login(email: string, password: string): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/login`, { email, password })
+      .pipe(
+        tap({
+          next: (loggedUser) => {
+            this.setSession(loggedUser);
+            this.cartService.viewCart().subscribe();
+          },
+        })
+      );
+  }
+
+  register(name: string, email: string, password: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, { name, email, password });
+  }
+
+  private setSession(authResult: any): void {
+    const expiresAt = new Date(authResult.expiresAt || 3600);
+
+    this.cookieService.set(
+      'token',
+      authResult.token,
+      expiresAt,
+      '/',
+      '',
+      true,
+      'Strict'
+    );
+    this.cookieService.set(
+      'user_name',
+      authResult.name,
+      expiresAt,
+      '/',
+      '',
+      true,
+      'Strict'
+    );
+    this.cookieService.set(
+      'user_email',
+      authResult.email,
+      expiresAt,
+      '/',
+      '',
+      true,
+      'Strict'
+    );
+    this.cookieService.set(
+      'user_role',
+      authResult.role,
+      expiresAt,
+      '/',
+      '',
+      true,
+      'Strict'
+    );
+  }
+
+  logout(): void {
+    this.cookieService.delete('token', '/');
+    this.cookieService.delete('user_name', '/');
+    this.cookieService.delete('user_email', '/');
+    this.cookieService.delete('user_role', '/');
+    this.cartService.removeCart();
+    this.router.navigate(['books']);
+  }
+
+  getToken(): string {
+    return this.cookieService.get('token');
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.cookieService.get('token');
+  }
+
+  getUserName(): string | null {
+    return this.cookieService.get('user_name');
+  }
+
+  getUserEmail(): string | null {
+    return this.cookieService.get('user_email');
+  }
+
+  getUserRole(): string | null {
+    return this.cookieService.get('user_role');
+  }
+
+  isAdminManageBooks() {
+    const isAdmin = this.getUserRole() === 'admin';
+    const isOnDashboard = this.router.url.includes('dashboard');
+    if (isAdmin && isOnDashboard) return true;
+    return false;
+  }
+}

@@ -1,0 +1,30 @@
+<td>{{ order().id }}</td>
+@if(isOnDashboard()){
+<td>
+  <form [formGroup]="statusForm">
+    <select
+      name="status"
+      id="status"
+      [formControl]="statusControl"
+      (click)="onPreventDefault($event)"
+    >
+      <option value="processing">Processing</option>
+      <option value="pending">Pending</option>
+      <option value="shipped">Shipped</option>
+      <option value="delivered">Delivered</option>
+      <option value="cancelled">Cancelled</option>
+      <option value="returned">Returned</option>
+      <option value="refunded">Refunded</option>
+      <option value="failed">Failed</option>
+    </select>
+  </form>
+</td>
+}
+<!--  -->
+@else {
+<td>
+  {{ order().status | capitalize }}
+</td>
+}
+<td>{{ +order().total_price | currency }}</td>
+<td>{{ order().created_at | date : "short" }}</td>
