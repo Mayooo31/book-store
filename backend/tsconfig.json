@@ -1,12 +1,9 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "target": "ES6",
-    "module": "commonjs",
-    "strict": true,
+    "typeRoots": ["./node_modules/@types"],
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "module": "CommonJS",
+    "strict": true
   },
   "include": ["./src/**/*", "./types/**/*"],
   "files": ["./types/global.d.ts"]
