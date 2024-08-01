@@ -4,9 +4,9 @@
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
-    "start": "node dist/server.js", 
-    "build": "tsc",               
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts" 
+    "build": "tsc", 
+    "start": "node dist/server.js",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts"
   },
   "author": "Mario",
   "license": "ISC",
