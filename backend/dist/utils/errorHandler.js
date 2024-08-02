@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var errorHandler = function (err, req, res, next) {
-    var errorStatus = err.status || 500;
-    var errorMessage = err.message || "Something went wrong. Please try again later! ";
+const errorHandler = (err, req, res, next) => {
+    const errorStatus = err.status || 500;
+    const errorMessage = err.message || "Something went wrong. Please try again later! ";
     return res.status(errorStatus).json({
         success: false,
         message: errorMessage,

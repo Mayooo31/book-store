@@ -3,9 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var pg_1 = __importDefault(require("pg"));
-var dotenv_1 = __importDefault(require("dotenv"));
-var Pool = pg_1.default.Pool;
+const pg_1 = __importDefault(require("pg"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const { Pool } = pg_1.default;
 dotenv_1.default.config();
 // const pool = new Pool({
 //   user: "postgres",
@@ -14,7 +14,7 @@ dotenv_1.default.config();
 //   password: "mario",
 //   port: 5432,
 // });
-var pool = new Pool({
+const pool = new Pool({
     connectionString: process.env.DATABASE_API,
     ssl: {
         rejectUnauthorized: false,

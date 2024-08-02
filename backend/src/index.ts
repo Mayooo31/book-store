@@ -13,7 +13,14 @@ const app = express();
 
 // middlewares
 app.use(express.json());
-app.use(cors());
+
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.get("/", (req: Request, res: Response) => {
   res.json({ name: "Mario" });

@@ -4,16 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createOrder = exports.removeAllItemsFromCart = exports.removeItemFromCart = exports.totalItemsInCart = exports.viewCart = exports.addItemToCart = void 0;
-var db_1 = __importDefault(require("../src/db"));
+const db_1 = __importDefault(require("../src/db"));
 // queries
-var cart_queries_1 = require("../queries/cart-queries");
+const cart_queries_1 = require("../queries/cart-queries");
 // utils
-var error_1 = __importDefault(require("../utils/error"));
-var addItemToCart = function (req, res, next) {
-    var userId = req.user.userId;
-    var _a = req.body, bookId = _a.bookId, quantity = _a.quantity;
-    var operation = req.body.operation;
-    db_1.default.query(cart_queries_1.addOrSetItemToCartQuery[operation], [userId, bookId, quantity], function (error, results) {
+const error_1 = __importDefault(require("../utils/error"));
+const addItemToCart = (req, res, next) => {
+    const userId = req.user.userId;
+    const { bookId, quantity } = req.body;
+    const operation = req.body.operation;
+    db_1.default.query(cart_queries_1.addOrSetItemToCartQuery[operation], [userId, bookId, quantity], (error, results) => {
         if (error) {
             console.log(error);
             return next((0, error_1.default)(500, "Item was not found. 😧"));
@@ -22,21 +22,21 @@ var addItemToCart = function (req, res, next) {
     });
 };
 exports.addItemToCart = addItemToCart;
-var viewCart = function (req, res, next) {
-    var userId = req.user.userId;
-    db_1.default.query(cart_queries_1.viewCartQuery, [userId], function (error, results) {
+const viewCart = (req, res, next) => {
+    const userId = req.user.userId;
+    db_1.default.query(cart_queries_1.viewCartQuery, [userId], (error, results) => {
         var _a;
         if (error) {
             return next((0, error_1.default)(500, "Error fetching cart items"));
         }
-        var cart = ((_a = results.rows[0]) === null || _a === void 0 ? void 0 : _a.cart) || { items: [], total_price: 0 };
+        const cart = ((_a = results.rows[0]) === null || _a === void 0 ? void 0 : _a.cart) || { items: [], total_price: 0 };
         res.status(200).json(cart);
     });
 };
 exports.viewCart = viewCart;
-var totalItemsInCart = function (req, res, next) {
-    var userId = req.user.userId;
-    db_1.default.query(cart_queries_1.totalItemsInCartQuery, [userId], function (error, results) {
+const totalItemsInCart = (req, res, next) => {
+    const userId = req.user.userId;
+    db_1.default.query(cart_queries_1.totalItemsInCartQuery, [userId], (error, results) => {
         if (error) {
             return next((0, error_1.default)(500, "Error fetching cart items"));
         }
@@ -44,10 +44,10 @@ var totalItemsInCart = function (req, res, next) {
     });
 };
 exports.totalItemsInCart = totalItemsInCart;
-var removeItemFromCart = function (req, res, next) {
-    var userId = req.user.userId;
-    var itemId = req.params.itemId;
-    db_1.default.query(cart_queries_1.removeItemFromCartQuery, [userId, itemId], function (error, results) {
+const removeItemFromCart = (req, res, next) => {
+    const userId = req.user.userId;
+    const { itemId } = req.params;
+    db_1.default.query(cart_queries_1.removeItemFromCartQuery, [userId, itemId], (error, results) => {
         if (error) {
             return next((0, error_1.default)(500, "Error removing from cart"));
         }
@@ -58,9 +58,9 @@ var removeItemFromCart = function (req, res, next) {
     });
 };
 exports.removeItemFromCart = removeItemFromCart;
-var removeAllItemsFromCart = function (req, res, next) {
-    var userId = req.user.userId;
-    db_1.default.query(cart_queries_1.removeAllItemsFromCartQuery, [userId], function (error, results) {
+const removeAllItemsFromCart = (req, res, next) => {
+    const userId = req.user.userId;
+    db_1.default.query(cart_queries_1.removeAllItemsFromCartQuery, [userId], (error, results) => {
         if (error || results.rows.length === 0) {
             return next((0, error_1.default)(500, "Error removing from cart"));
         }
@@ -68,15 +68,15 @@ var removeAllItemsFromCart = function (req, res, next) {
     });
 };
 exports.removeAllItemsFromCart = removeAllItemsFromCart;
-var createOrder = function (req, res, next) {
-    var userId = req.user.userId;
-    var _a = req.body, shippingAddress = _a.shippingAddress, paymentMethod = _a.paymentMethod;
-    db_1.default.query(cart_queries_1.createOrderQuery, [userId, shippingAddress, paymentMethod], function (error, result) {
+const createOrder = (req, res, next) => {
+    const userId = req.user.userId;
+    const { shippingAddress, paymentMethod } = req.body;
+    db_1.default.query(cart_queries_1.createOrderQuery, [userId, shippingAddress, paymentMethod], (error, result) => {
         if (error) {
             return next((0, error_1.default)(500, error));
         }
-        var orderId = result.rows[0].p_order_id;
-        res.status(201).json({ message: "Order placed successfully", orderId: orderId });
+        const orderId = result.rows[0].p_order_id;
+        res.status(201).json({ message: "Order placed successfully", orderId });
     });
 };
 exports.createOrder = createOrder;

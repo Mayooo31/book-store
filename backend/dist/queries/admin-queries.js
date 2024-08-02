@@ -8,5 +8,26 @@ exports.addGenresToBookQuery = "SELECT insert_book_genres($1, $2::INT[])";
 exports.updateBookQuery = "UPDATE book SET title = $2, author = $3, description = $4, price = $5, year_published = $6, cover_image = $7, pages = $8, rating = $9, is_available = $10 WHERE id = $1 RETURNING *";
 exports.updateGenresToBookQuery = "SELECT update_book_genres($1, $2::INT[])";
 exports.deleteBookByIdQuery = "DELETE FROM book WHERE id = $1";
-exports.getStatisticsQuery = "SELECT\n  -- Sum of total_price from orders in the last month\n  (SELECT COALESCE(SUM(total_price), 0)\n   FROM orders\n   WHERE created_at >= (CURRENT_TIMESTAMP - interval '1 month')\n     AND created_at < CURRENT_TIMESTAMP) AS total_sales_last_month,\n  \n  -- Number of orders in the last month\n  (SELECT COUNT(*)\n   FROM orders\n   WHERE created_at >= (CURRENT_TIMESTAMP - interval '1 month')\n     AND created_at < CURRENT_TIMESTAMP) AS number_of_orders_last_month,\n  \n  -- Number of distinct customers who made orders in the last month\n  (SELECT COUNT(DISTINCT user_id)\n   FROM orders\n   WHERE created_at >= (CURRENT_TIMESTAMP - interval '1 month')\n     AND created_at < CURRENT_TIMESTAMP) AS number_of_customers_last_month,\n\n  -- Count of all books\n  (SELECT COUNT(*) FROM book) AS total_books_count;\n";
+exports.getStatisticsQuery = `SELECT
+  -- Sum of total_price from orders in the last month
+  (SELECT COALESCE(SUM(total_price), 0)
+   FROM orders
+   WHERE created_at >= (CURRENT_TIMESTAMP - interval '1 month')
+     AND created_at < CURRENT_TIMESTAMP) AS total_sales_last_month,
+  
+  -- Number of orders in the last month
+  (SELECT COUNT(*)
+   FROM orders
+   WHERE created_at >= (CURRENT_TIMESTAMP - interval '1 month')
+     AND created_at < CURRENT_TIMESTAMP) AS number_of_orders_last_month,
+  
+  -- Number of distinct customers who made orders in the last month
+  (SELECT COUNT(DISTINCT user_id)
+   FROM orders
+   WHERE created_at >= (CURRENT_TIMESTAMP - interval '1 month')
+     AND created_at < CURRENT_TIMESTAMP) AS number_of_customers_last_month,
+
+  -- Count of all books
+  (SELECT COUNT(*) FROM book) AS total_books_count;
+`;
 exports.getGenresQuery = "SELECT * FROM genre";

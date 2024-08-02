@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _1 = __importDefault(require("."));
-var dotenv_1 = __importDefault(require("dotenv"));
+const _1 = __importDefault(require("."));
+const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-var PORT = process.env.PORT;
-_1.default.listen(PORT, function () { return console.log("App is running on port ".concat(PORT, ". \uD83D\uDE0E")); });
+const PORT = process.env.PORT;
+_1.default.listen(PORT, () => console.log(`App is running on port ${PORT}. 😎`));

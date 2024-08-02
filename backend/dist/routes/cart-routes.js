@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = require("express");
+const express_1 = require("express");
 // controllers
-var cart_controllers_1 = require("../controllers/cart-controllers");
+const cart_controllers_1 = require("../controllers/cart-controllers");
 // middlewares
-var auth_middleware_1 = require("../middlewares/auth-middleware");
-var router = (0, express_1.Router)();
+const auth_middleware_1 = require("../middlewares/auth-middleware");
+const router = (0, express_1.Router)();
 // checking if im logged in
 router.use(auth_middleware_1.verifyToken);
 // routes

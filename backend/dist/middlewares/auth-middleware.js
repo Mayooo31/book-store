@@ -4,21 +4,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyIsUserAdmin = exports.verifyToken = void 0;
-var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-var dotenv_1 = __importDefault(require("dotenv"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const dotenv_1 = __importDefault(require("dotenv"));
 // utils
-var error_1 = __importDefault(require("../utils/error"));
+const error_1 = __importDefault(require("../utils/error"));
 dotenv_1.default.config();
-var verifyToken = function (req, res, next) {
-    var authHeader = req.headers["authorization"];
+const verifyToken = (req, res, next) => {
+    const authHeader = req.headers["authorization"];
     if (!authHeader) {
         return next((0, error_1.default)(401, "No token provided. Please login! 😞"));
     }
-    var token = authHeader.split(" ")[1];
+    const token = authHeader.split(" ")[1];
     if (!token) {
         return next((0, error_1.default)(401, "Invalid token format. Please login! 🤔"));
     }
-    jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET, function (err, decoded) {
+    jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
             return next((0, error_1.default)(401, "Failed to authenticate token. Please login! 🤔"));
         }
@@ -30,7 +30,7 @@ var verifyToken = function (req, res, next) {
     });
 };
 exports.verifyToken = verifyToken;
-var verifyIsUserAdmin = function (req, res, next) {
+const verifyIsUserAdmin = (req, res, next) => {
     if (req.user.role !== "admin") {
         return next((0, error_1.default)(401, "You are not allowed to do this. 👺"));
     }

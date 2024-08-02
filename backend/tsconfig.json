@@ -1,21 +1,14 @@
 {
   "compilerOptions": {
     "typeRoots": ["./node_modules/@types"],
+    "outDir": "./dist",
+    "rootDir": "./",
+    "target": "ES6",
+    "module": "commonjs",
+    "strict": true,
     "esModuleInterop": true,
-    "module": "CommonJS",
-    "strict": true
+    "skipLibCheck": true
   },
-  "include": ["./src/**/*", "./types/**/*"],
+  "include": ["backend/**/*", "./src/**/*", "./types/**/*"],
   "files": ["./types/global.d.ts"]
 }
-
-// {
-//   "outDir": "./dist",
-//   "rootDir": "./src",
-//   "target": "ES6",
-//   "module": "commonjs",
-//   "strict": true,
-//   "esModuleInterop": true,
-//   "skipLibCheck": true,
-//   "typeRoots": ["./node_modules/@types"],
-// }
