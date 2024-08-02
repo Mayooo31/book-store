@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getGenresQuery = exports.getStatisticsQuery = exports.deleteBookByIdQuery = exports.updateGenresToBookQuery = exports.updateBookQuery = exports.addGenresToBookQuery = exports.addBookQuery = exports.updateOrderStatusQuery = exports.getAllOrdersQuery = void 0;
+exports.getAllOrdersQuery = "SELECT * FROM orders ORDER BY created_at DESC LIMIT $1 OFFSET $2";
+exports.updateOrderStatusQuery = "UPDATE orders SET status = $1 WHERE id = $2";
+exports.addBookQuery = "INSERT INTO book (title, author, description, price, year_published, cover_image, pages, rating, is_available) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id";
+exports.addGenresToBookQuery = "SELECT insert_book_genres($1, $2::INT[])";
+exports.updateBookQuery = "UPDATE book SET title = $2, author = $3, description = $4, price = $5, year_published = $6, cover_image = $7, pages = $8, rating = $9, is_available = $10 WHERE id = $1 RETURNING *";
+exports.updateGenresToBookQuery = "SELECT update_book_genres($1, $2::INT[])";
+exports.deleteBookByIdQuery = "DELETE FROM book WHERE id = $1";
+exports.getStatisticsQuery = "SELECT\n  -- Sum of total_price from orders in the last month\n  (SELECT COALESCE(SUM(total_price), 0)\n   FROM orders\n   WHERE created_at >= (CURRENT_TIMESTAMP - interval '1 month')\n     AND created_at < CURRENT_TIMESTAMP) AS total_sales_last_month,\n  \n  -- Number of orders in the last month\n  (SELECT COUNT(*)\n   FROM orders\n   WHERE created_at >= (CURRENT_TIMESTAMP - interval '1 month')\n     AND created_at < CURRENT_TIMESTAMP) AS number_of_orders_last_month,\n  \n  -- Number of distinct customers who made orders in the last month\n  (SELECT COUNT(DISTINCT user_id)\n   FROM orders\n   WHERE created_at >= (CURRENT_TIMESTAMP - interval '1 month')\n     AND created_at < CURRENT_TIMESTAMP) AS number_of_customers_last_month,\n\n  -- Count of all books\n  (SELECT COUNT(*) FROM book) AS total_books_count;\n";
+exports.getGenresQuery = "SELECT * FROM genre";

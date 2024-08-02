@@ -8,3 +8,14 @@
   "include": ["./src/**/*", "./types/**/*"],
   "files": ["./types/global.d.ts"]
 }
+
+// {
+//   "outDir": "./dist",
+//   "rootDir": "./src",
+//   "target": "ES6",
+//   "module": "commonjs",
+//   "strict": true,
+//   "esModuleInterop": true,
+//   "skipLibCheck": true,
+//   "typeRoots": ["./node_modules/@types"],
+// }
