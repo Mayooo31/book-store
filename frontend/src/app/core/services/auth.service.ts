@@ -1,7 +1,7 @@
-import { inject, Injectable, Injector } from '@angular/core';
+import { DestroyRef, inject, Injectable, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap, switchMap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
@@ -16,6 +16,7 @@ export class AuthService {
   private cookieService = inject(CookieService);
   private router = inject(Router);
   private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
 
   // using injector because two services use each other and that can cause a loop
   private _cartService?: CartService;
@@ -30,8 +31,11 @@ export class AuthService {
     return this.http
       .post<any>(`${this.apiUrl}/login`, { email, password })
       .pipe(
-        tap((loggedUser) => this.setSession(loggedUser)),
-        switchMap(() => this.cartService.viewCart()) // Automatically refresh the cart after login
+        tap((loggedUser) => {
+          this.setSession(loggedUser);
+          const subscription = this.cartService.viewCart().subscribe();
+          this.destroyRef.onDestroy(() => subscription.unsubscribe());
+        })
       );
   }
 

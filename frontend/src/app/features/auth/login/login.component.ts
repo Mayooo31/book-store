@@ -21,7 +21,7 @@ export class LoginComponent {
   private toastr = inject(ToastrService);
   private authService = inject(AuthService);
   private router = inject(Router);
-  private destroyRef = inject(DestroyRef)
+  private destroyRef = inject(DestroyRef);
   loading = signal(false);
   error = signal('');
 
