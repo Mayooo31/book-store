@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  input,
+  Input,
+  output,
+  Output,
+} from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -9,11 +16,12 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
   styleUrl: './cart-payment-form.component.css',
 })
 export class CartPaymentFormComponent {
-  @Output() formSubmit = new EventEmitter<void>();
-  @Input() form!: FormGroup;
+  checkoutLoading = input();
+  form = input.required<FormGroup>();
+  formSubmit = output();
 
   getValidity(controlName: string): boolean {
-    const control = this.form.get(controlName);
+    const control = this.form().get(controlName);
     return control!.touched && control!.dirty && control!.invalid;
   }
 

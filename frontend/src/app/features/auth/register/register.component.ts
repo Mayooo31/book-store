@@ -41,6 +41,7 @@ export class RegisterComponent {
 
   onSubmit() {
     if (this.form.invalid) return;
+    this.loading.set(true);
     this.error.set('');
 
     const { name, email, password } = this.form.value;

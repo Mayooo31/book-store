@@ -33,6 +33,7 @@ export class CartComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   cart = this.cartService.cart;
   loading = signal<boolean>(true);
+  checkoutLoading = signal<boolean>(false);
   error = signal<string>('');
   private subscriptions: Subscription = new Subscription();
 
@@ -90,6 +91,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   onCheckout(): void {
     if (this.form.invalid) return;
+    this.checkoutLoading.set(true);
 
     const address = this.form.value.address;
     const creditCard = this.form.value['credit-card'];
@@ -107,8 +109,11 @@ export class CartComponent implements OnInit, OnDestroy {
             'Successfully ordered. We are already working on your order...'
           );
         },
-        error: (err) =>
-          this.toastr.error('Something happened. Please try again later...'),
+        error: (err) => {
+          this.checkoutLoading.set(false);
+          this.toastr.error('Something happened. Please try again later...');
+        },
+        complete: () => this.checkoutLoading.set(false),
       });
 
     this.subscriptions.add(checkoutSubscription);

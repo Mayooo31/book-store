@@ -93,7 +93,6 @@ export class BookListComponent implements OnInit {
           }
         },
         error: (error) => {
-          console.log(error);
           this.error.set(error.error.message);
           this.loading.set(false);
         },

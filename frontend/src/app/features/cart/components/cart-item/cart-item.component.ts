@@ -59,9 +59,7 @@ export class CartItemComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     const deleteBookSubscription = this.cartService
       .deleteBook(this.item().book_id)
-      .subscribe({
-        error: (err) => console.log(err),
-      });
+      .subscribe();
 
     this.subscriptions.add(deleteBookSubscription);
   }

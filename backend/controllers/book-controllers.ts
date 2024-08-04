@@ -53,7 +53,6 @@ export const getBookById = (
   next: NextFunction
 ): void => {
   const { bookId } = req.params;
-  console.log(bookId);
   pool.query(getBookByIdQuery, [+bookId], (error, results) => {
     if (error) {
       return next(createError(500, "Error fetching book details"));

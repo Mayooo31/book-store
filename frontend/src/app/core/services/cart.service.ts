@@ -44,7 +44,7 @@ export class CartService {
 
     if (operation === 'add') {
       const item = this.cart_().items.find((item) => item.book_id === bookId);
-      if (item && item.quantity === 10) {
+      if (item && item.quantity > 9) {
         this.toastr.error('You can have a maximum of 10 pieces of one item.');
         return of(null);
       }

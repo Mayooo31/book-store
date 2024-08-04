@@ -172,7 +172,6 @@ export const updateBook = (
         [+bookId, genres],
         (error, results) => {
           if (error) {
-            console.log(error);
             return next(createError(500, "Error updating book"));
           }
           res
@@ -192,7 +191,6 @@ export const deleteBook = (
   const { bookId } = req.params;
   pool.query(deleteBookByIdQuery, [+bookId], (error, results) => {
     if (error) {
-      console.log(error);
       return next(createError(500, "Error deleting book"));
     }
     if (results.rowCount === 0) {

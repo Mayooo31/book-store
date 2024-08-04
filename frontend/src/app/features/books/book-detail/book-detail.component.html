@@ -36,11 +36,8 @@
           Price: <span>{{ book().price | currency }}</span>
         </p>
       </div>
-      <button
-        (click)="onAddToCart()"
-        [disabled]="!book().is_available"
-      >
-        ADD TO CART
+      <button (click)="onAddToCart()" [disabled]="!book().is_available">
+        {{ addBookLoading() ? "ADDING..." : "ADD TO CART" }}
       </button>
     </div>
   </div>

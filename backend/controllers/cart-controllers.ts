@@ -26,7 +26,6 @@ export const addItemToCart = (
     [userId, bookId, quantity],
     (error, results) => {
       if (error) {
-        console.log(error);
         return next(createError(500, "Item was not found. 😧"));
       }
       res.status(201).json(results.rows[0]);

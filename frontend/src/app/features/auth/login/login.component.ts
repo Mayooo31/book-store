@@ -36,6 +36,7 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.form.invalid) return;
+    this.loading.set(true);
     this.error.set('');
 
     const { email, password } = this.form.value;

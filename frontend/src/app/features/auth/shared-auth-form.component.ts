@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -6,10 +6,10 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
   standalone: true,
   imports: [ReactiveFormsModule],
   template: `
-    <form class="form-container" [formGroup]="form" (submit)="onSubmit()">
-      <h1>{{ title }}</h1>
+    <form class="form-container" [formGroup]="form()" (submit)="onSubmit()">
+      <h1>{{ title() }}</h1>
 
-      @for(control of formControls; track control){
+      @for(control of formControls(); track control){
       <div>
         <label [for]="control">{{ getLabel(control) }}:</label>
         <input
@@ -21,24 +21,30 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         <p class="error">{{ getErrorMessage(control) }}</p>
         }
       </div>
-      } @if(error){
-      <p class="error">{{ error }}</p>
+      } @if(error()){
+      <p class="error">{{ error() }}</p>
       }
-      <button type="submit" [disabled]="loading">Submit</button>
+      <button type="submit" [disabled]="loading()">
+        {{ loading() ? loadingMessage() : 'Submit' }}
+      </button>
     </form>
   `,
   styleUrls: ['./shared-auth-form.component.css'],
 })
 export class SharedAuthFormComponent {
-  @Input() form!: FormGroup;
-  @Input() title!: string;
-  @Input() error!: string;
-  @Input() loading!: boolean;
-  @Input() formControls!: string[];
-  @Output() formSubmit = new EventEmitter<void>();
+  form = input.required<FormGroup>();
+  title = input.required<string>();
+  error = input.required<string>();
+  loading = input.required<boolean>();
+  formControls = input.required<string[]>();
+  formSubmit = output();
+
+  loadingMessage = computed(() => {
+    return this.title() === 'Login' ? 'Logging...' : 'Registering...';
+  });
 
   getValidity(controlName: string): boolean {
-    const control = this.form.get(controlName);
+    const control = this.form().get(controlName);
     return control!.touched && control!.dirty && control!.invalid;
   }
 
