@@ -1,6 +1,7 @@
 import { inject, Injectable, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
+import { tap, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
@@ -16,7 +17,7 @@ export class AuthService {
   private router = inject(Router);
   private injector = inject(Injector);
 
-  // using injector because two services uses each other and that can cause loop
+  // using injector because two services use each other and that can cause a loop
   private _cartService?: CartService;
   private get cartService(): CartService {
     if (!this._cartService) {
@@ -29,12 +30,8 @@ export class AuthService {
     return this.http
       .post<any>(`${this.apiUrl}/login`, { email, password })
       .pipe(
-        tap({
-          next: (loggedUser) => {
-            this.setSession(loggedUser);
-            this.cartService.viewCart().subscribe();
-          },
-        })
+        tap((loggedUser) => this.setSession(loggedUser)),
+        switchMap(() => this.cartService.viewCart()) // Automatically refresh the cart after login
       );
   }
 
@@ -112,10 +109,9 @@ export class AuthService {
     return this.cookieService.get('user_role');
   }
 
-  isAdminManageBooks() {
+  isAdminManageBooks(): boolean {
     const isAdmin = this.getUserRole() === 'admin';
     const isOnDashboard = this.router.url.includes('dashboard');
-    if (isAdmin && isOnDashboard) return true;
-    return false;
+    return isAdmin && isOnDashboard;
   }
 }

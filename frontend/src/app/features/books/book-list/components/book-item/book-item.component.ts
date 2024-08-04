@@ -1,4 +1,11 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { Book } from '../../../../../types/types';
 import { CurrencyPipe } from '@angular/common';
 import { CartService } from '../../../../../core/services/cart.service';
@@ -20,18 +27,20 @@ export class BookItemComponent implements OnInit {
   private authService = inject(AuthService);
   private cartService = inject(CartService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
   private addToCartSubject = new Subject<{
     bookId: number;
   }>();
   book = input<Book>({} as Book);
 
   ngOnInit() {
-    this.addToCartSubject
+    const subscription = this.addToCartSubject
       .pipe(
         debounceTime(300),
         switchMap(({ bookId }) => this.cartService.addBook(bookId, 1, 'add'))
       )
       .subscribe();
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   onAddToCart(event: Event): void {
@@ -45,7 +54,10 @@ export class BookItemComponent implements OnInit {
 
   onDeleteBook(event: Event) {
     event.stopPropagation();
-    this.bookService.deleteBook(this.book().id).subscribe();
+    const subscription = this.bookService
+      .deleteBook(this.book().id)
+      .subscribe();
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   goToUpdatePage(event: Event) {

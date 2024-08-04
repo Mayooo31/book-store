@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CartService } from '../../core/services/cart.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CartItemComponent } from './components/cart-item/cart-item.component';
@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 import { CartPaymentFormComponent } from './components/cart-payment-form/cart-payment-form.component';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cart',
@@ -23,9 +24,9 @@ import { ToastrService } from 'ngx-toastr';
     CartPaymentFormComponent,
   ],
   templateUrl: './cart.component.html',
-  styleUrl: './cart.component.css',
+  styleUrls: ['./cart.component.css'],
 })
-export class CartComponent {
+export class CartComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private cartService = inject(CartService);
   private toastr = inject(ToastrService);
@@ -33,6 +34,7 @@ export class CartComponent {
   cart = this.cartService.cart;
   loading = signal<boolean>(true);
   error = signal<string>('');
+  private subscriptions: Subscription = new Subscription();
 
   form = new FormGroup({
     address: new FormControl('', {
@@ -45,23 +47,34 @@ export class CartComponent {
 
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
-      this.cartService.viewCart().subscribe({
+      const cartSubscription = this.cartService.viewCart().subscribe({
         error: (err) => {
           this.loading.set(false);
-          this.error.set('Something happend... We could not fetch your cart.');
+          this.error.set('Something happened... We could not fetch your cart.');
         },
         complete: () => this.loading.set(false),
       });
+      this.subscriptions.add(cartSubscription);
     }
 
-    this.form.get('credit-card')?.valueChanges.subscribe((value) => {
-      if (value !== null && typeof value === 'string') {
-        const formattedValue = this.formatCreditCard(value);
-        this.form
-          .get('credit-card')
-          ?.setValue(formattedValue, { emitEvent: false });
-      }
-    });
+    const creditCardSubscription = this.form
+      .get('credit-card')
+      ?.valueChanges.subscribe((value) => {
+        if (value !== null && typeof value === 'string') {
+          const formattedValue = this.formatCreditCard(value);
+          this.form
+            .get('credit-card')
+            ?.setValue(formattedValue, { emitEvent: false });
+        }
+      });
+
+    if (creditCardSubscription) {
+      this.subscriptions.add(creditCardSubscription);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   private formatCreditCard(value: string): string {
@@ -83,17 +96,22 @@ export class CartComponent {
 
     if (!address || !creditCard) return;
 
-    this.cartService.checkout(address, creditCard).subscribe({
-      next: (response) => {
-        this.router.navigate(['order/history', response.orderId]);
-        this.cartService.viewCart().subscribe();
-        this.toastr.success(
-          'Successfully ordered. We are already working on your order...'
-        );
-      },
-      error: (err) =>
-        this.toastr.error('Somethind happend. Please try again later...'),
-    });
+    const checkoutSubscription = this.cartService
+      .checkout(address, creditCard)
+      .subscribe({
+        next: (response) => {
+          this.router.navigate(['order/history', response.orderId]);
+          const viewCartSubscription = this.cartService.viewCart().subscribe();
+          this.subscriptions.add(viewCartSubscription);
+          this.toastr.success(
+            'Successfully ordered. We are already working on your order...'
+          );
+        },
+        error: (err) =>
+          this.toastr.error('Something happened. Please try again later...'),
+      });
+
+    this.subscriptions.add(checkoutSubscription);
   }
 
   isLoggedIn() {
@@ -105,9 +123,13 @@ export class CartComponent {
   }
 
   onRemoveAllBooksFromCart() {
-    this.cartService.deleteAllBooksFromCart().subscribe({
-      complete: () =>
-        this.toastr.success('Successfully removed all books from cart...'),
-    });
+    const removeAllBooksSubscription = this.cartService
+      .deleteAllBooksFromCart()
+      .subscribe({
+        complete: () =>
+          this.toastr.success('Successfully removed all books from cart...'),
+      });
+
+    this.subscriptions.add(removeAllBooksSubscription);
   }
 }

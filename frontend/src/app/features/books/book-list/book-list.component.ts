@@ -6,7 +6,7 @@ import { CurrencyPipe } from '@angular/common';
 import { BookItemComponent } from './components/book-item/book-item.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime } from 'rxjs';
+import { debounceTime, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-book-list',
@@ -32,39 +32,55 @@ export class BookListComponent implements OnInit {
     search: new FormControl(''),
   });
 
+  private subscriptions: Subscription[] = [];
+
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      this.page.set(+params['page'] || this.page());
-      this.limit.set(+params['limit'] || this.limit());
+    const queryParamsSubscription = this.route.queryParams.subscribe(
+      (params) => {
+        this.page.set(+params['page'] || this.page());
+        this.limit.set(+params['limit'] || this.limit());
 
-      if (this.page() < 1) {
-        this.page.set(1);
-        this.router.navigate(['books']);
-        return;
+        if (this.page() < 1) {
+          this.page.set(1);
+          this.router.navigate(['books']);
+          return;
+        }
+
+        this.onGetBooks();
       }
+    );
 
-      this.onGetBooks();
-    });
+    this.subscriptions.push(queryParamsSubscription);
 
-    this.searchForm.valueChanges.pipe(debounceTime(500)).subscribe({
-      next: (results) => {
-        this.bookService
-          .getBooksBaseOnSearchInput(results.search ?? '')
-          .subscribe({
-            next: (results) => {
-              const { currentPage, totalPages, totalBooks } = results;
-              this.paginationInfo.set({ currentPage, totalPages, totalBooks });
-            },
-          });
-      },
-    });
+    const searchFormSubscription = this.searchForm.valueChanges
+      .pipe(debounceTime(500))
+      .subscribe({
+        next: (results) => {
+          const searchSubscription = this.bookService
+            .getBooksBaseOnSearchInput(results.search ?? '')
+            .subscribe({
+              next: (results) => {
+                const { currentPage, totalPages, totalBooks } = results;
+                this.paginationInfo.set({
+                  currentPage,
+                  totalPages,
+                  totalBooks,
+                });
+              },
+            });
+
+          this.subscriptions.push(searchSubscription);
+        },
+      });
+
+    this.subscriptions.push(searchFormSubscription);
   }
 
   onGetBooks() {
     this.error.set('');
     this.loading.set(true);
 
-    const subscription = this.bookService
+    const bookSubscription = this.bookService
       .getBooks(this.page(), this.limit())
       .subscribe({
         next: (results) => {
@@ -77,13 +93,14 @@ export class BookListComponent implements OnInit {
           }
         },
         error: (error) => {
+          console.log(error);
           this.error.set(error.error.message);
           this.loading.set(false);
         },
         complete: () => this.loading.set(false),
       });
 
-    this.destroyRef.onDestroy(() => subscription.unsubscribe());
+    this.subscriptions.push(bookSubscription);
   }
 
   nextPage(): void {
@@ -102,5 +119,9 @@ export class BookListComponent implements OnInit {
     this.router.navigate([navigateTo], {
       queryParams: { page: this.page(), limit: this.limit() },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 }

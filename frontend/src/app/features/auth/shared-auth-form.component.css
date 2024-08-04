@@ -20,6 +20,16 @@ form button {
   color: #428257;
   padding: 0.4rem 0.8rem;
   border-radius: 0.4rem;
+  border: 3px solid #ffb9a7;
+}
+
+form button:hover {
+  background: #f4ad9b;
+}
+
+form button:active {
+  background: #428257;
+  color: #ffb9a7;
 }
 
 form label {
@@ -30,10 +40,6 @@ form button {
   font-size: 1.4rem;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-form button:hover {
-  background: #f4ad9b;
 }
 
 .error {

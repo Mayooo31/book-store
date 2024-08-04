@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, Renderer2, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -13,6 +13,7 @@ import { BookService } from '../../books/book.service';
 import { Book } from '../../../types/types';
 import { minSelectedGenres } from '../../../validators';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-add-update-book',
@@ -21,7 +22,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './add-update-book.component.html',
   styleUrls: ['./add-update-book.component.css'],
 })
-export class AddUpdateBookComponent implements OnInit {
+export class AddUpdateBookComponent implements OnInit, OnDestroy {
   private dashboardService = inject(DashboardService);
   private bookService = inject(BookService);
   private route = inject(ActivatedRoute);
@@ -33,6 +34,8 @@ export class AddUpdateBookComponent implements OnInit {
   isUpdating = this.router.url.includes('update-book');
   bookForm: FormGroup;
   error = signal('');
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor() {
     this.bookForm = this.fb.group({
@@ -52,33 +55,42 @@ export class AddUpdateBookComponent implements OnInit {
   ngOnInit(): void {
     window.scrollTo(0, 0);
 
-    this.dashboardService.getGenres().subscribe();
+    const genresSubscription = this.dashboardService.getGenres().subscribe();
+    this.subscriptions.add(genresSubscription);
 
     if (this.isUpdating) {
-      this.bookService.getBookById(+this.bookId!).subscribe({
-        next: (results: Book) => {
-          this.bookForm.patchValue({
-            title: results.title,
-            author: results.author,
-            description: results.description,
-            price: results.price,
-            yearPublished: results.year_published,
-            coverImage: results.cover_image,
-            pages: results.pages,
-            rating: results.rating,
-            isAvailable: results.is_available,
-          });
+      const bookSubscription = this.bookService
+        .getBookById(+this.bookId!)
+        .subscribe({
+          next: (results: Book) => {
+            this.bookForm.patchValue({
+              title: results.title,
+              author: results.author,
+              description: results.description,
+              price: results.price,
+              yearPublished: results.year_published,
+              coverImage: results.cover_image,
+              pages: results.pages,
+              rating: results.rating,
+              isAvailable: results.is_available,
+            });
 
-          const genresControl = this.bookForm.get('genres') as FormArray;
-          results.genres.forEach((genreName) => {
-            const genre = this.genres().find((g) => g.genre === genreName);
-            if (genre) {
-              genresControl.push(this.fb.control(genre.id));
-            }
-          });
-        },
-      });
+            const genresControl = this.bookForm.get('genres') as FormArray;
+            results.genres.forEach((genreName) => {
+              const genre = this.genres().find((g) => g.genre === genreName);
+              if (genre) {
+                genresControl.push(this.fb.control(genre.id));
+              }
+            });
+          },
+        });
+
+      this.subscriptions.add(bookSubscription);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   getValidity(controlName: string): boolean {
@@ -106,26 +118,32 @@ export class AddUpdateBookComponent implements OnInit {
     if (!this.bookForm.valid) return;
 
     if (this.isUpdating) {
-      this.dashboardService
+      const updateSubscription = this.dashboardService
         .updateBook(+this.bookId!, this.bookForm.value)
         .subscribe({
           error: (err) => {
-            this.error.set('Something happend. Please try again later!');
+            this.error.set('Something happened. Please try again later!');
           },
           next: (results) => {
             this.router.navigate(['books', this.bookId]);
             this.toastr.success('Successfully updated a book.');
           },
         });
+
+      this.subscriptions.add(updateSubscription);
     } else {
-      this.dashboardService.addBook(this.bookForm.value).subscribe({
-        error: (err) =>
-          this.error.set('Something happend. Please try again later!'),
-        next: (results: { id: string }) => {
-          this.router.navigate(['books', results.id]);
-          this.toastr.success('Successfully added a book.');
-        },
-      });
+      const addSubscription = this.dashboardService
+        .addBook(this.bookForm.value)
+        .subscribe({
+          error: (err) =>
+            this.error.set('Something happened. Please try again later!'),
+          next: (results: { id: string }) => {
+            this.router.navigate(['books', results.id]);
+            this.toastr.success('Successfully added a book.');
+          },
+        });
+
+      this.subscriptions.add(addSubscription);
     }
   }
 }

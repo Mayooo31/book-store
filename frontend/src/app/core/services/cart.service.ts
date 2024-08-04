@@ -1,11 +1,12 @@
 import { computed, inject, Injectable, signal, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, tap } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { type Cart } from '../../types/types';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from './auth.service';
 import { initialCart } from '../../constants';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class CartService {
   private injector = inject(Injector);
   private cart_ = signal<Cart>(initialCart);
 
-  // using injector because two services uses each other and that can cause loop
+  // using injector because two services use each other and that can cause a loop
   private _authService?: AuthService;
   private get authService(): AuthService {
     if (!this._authService) {
@@ -56,24 +57,34 @@ export class CartService {
         operation,
       })
       .pipe(
-        tap({
-          next: () => this.viewCart().subscribe(),
+        switchMap(() => this.viewCart()), // Automatically refresh the cart after adding a book
+        catchError((error) => {
+          this.toastr.error(
+            'An error occurred while adding the book to the cart.'
+          );
+          return of(null);
         })
       );
   }
 
   deleteBook(bookId: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${bookId}`).pipe(
-      tap({
-        next: () => this.viewCart().subscribe(),
+      switchMap(() => this.viewCart()), // Automatically refresh the cart after deleting a book
+      catchError((error) => {
+        this.toastr.error(
+          'An error occurred while deleting the book from the cart.'
+        );
+        return of(null);
       })
     );
   }
 
   deleteAllBooksFromCart(): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}`).pipe(
-      tap({
-        next: () => this.viewCart().subscribe(),
+      switchMap(() => this.viewCart()), // Automatically refresh the cart after deleting all books
+      catchError((error) => {
+        this.toastr.error('An error occurred while clearing the cart.');
+        return of(null);
       })
     );
   }
@@ -82,6 +93,10 @@ export class CartService {
     return this.http.get<Cart>(`${this.apiUrl}`).pipe(
       tap({
         next: (results) => this.cart_.set(results),
+      }),
+      catchError((error) => {
+        this.toastr.error('An error occurred while fetching the cart.');
+        return of(null);
       })
     );
   }
@@ -91,10 +106,17 @@ export class CartService {
   }
 
   checkout(shippingAddress: string, paymentMethod: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/checkout`, {
-      shippingAddress,
-      paymentMethod,
-    });
+    return this.http
+      .post<any>(`${this.apiUrl}/checkout`, {
+        shippingAddress,
+        paymentMethod,
+      })
+      .pipe(
+        catchError((error) => {
+          this.toastr.error('An error occurred during checkout.');
+          return of(null);
+        })
+      );
   }
 
   removeCart() {

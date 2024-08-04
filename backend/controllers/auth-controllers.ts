@@ -84,7 +84,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
         role: loggedUser.role,
       },
       process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRATION_TIME }
+      { expiresIn: process.env.JWT_EXPIRATION_TIME! }
     );
 
     const expirationDate = new Date();

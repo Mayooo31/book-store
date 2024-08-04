@@ -2,7 +2,7 @@ import { Directive, HostListener, ElementRef, Renderer2 } from '@angular/core';
 import { HeaderService } from '../services/header.service';
 
 @Directive({
-  selector: 'a[closeNavbar]', // Ensures the directive can only be used on <a> elements
+  selector: 'a[closeNavbar]',
   standalone: true,
 })
 export class CloseNavbarDirective {
@@ -14,7 +14,7 @@ export class CloseNavbarDirective {
 
   @HostListener('click', ['$event'])
   onClick(event: Event): void {
-    event.preventDefault(); // Prevent default anchor behavior (if necessary)
+    event.preventDefault();
     this.headerService.closeNavbar();
   }
 }

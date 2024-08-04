@@ -42,12 +42,14 @@ export class BookDetailComponent implements OnInit {
 
     /////////
 
-    this.addToCartSubject
+    const subscription2 = this.addToCartSubject
       .pipe(
         debounceTime(300),
         switchMap(({ bookId }) => this.cartService.addBook(bookId, 1, 'add'))
       )
       .subscribe();
+
+    this.destroyRef.onDestroy(() => subscription2.unsubscribe());
   }
 
   onAddToCart(): void {

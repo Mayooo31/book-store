@@ -1,18 +1,28 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  Input,
+  OnInit,
+  OnDestroy,
+  signal,
+  input,
+} from '@angular/core';
 import { CartItem } from '../../../../types/types';
 import { CurrencyPipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CartService } from '../../../../core/services/cart.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'tr[app-cart-item]',
   standalone: true,
   imports: [CurrencyPipe, ReactiveFormsModule],
   templateUrl: './cart-item.component.html',
-  styleUrl: './cart-item.component.css',
+  styleUrls: ['./cart-item.component.css'],
 })
-export class CartItemComponent implements OnInit {
+export class CartItemComponent implements OnInit, OnDestroy {
   private cartService = inject(CartService);
+  private subscriptions: Subscription = new Subscription();
   item = input<CartItem>({} as CartItem);
 
   quantityForm!: FormGroup;
@@ -24,13 +34,21 @@ export class CartItemComponent implements OnInit {
       quantity: this.quantityControl,
     });
 
-    this.quantityForm.valueChanges.subscribe({
-      next: (result: { quantity: number }) => {
-        this.cartService
-          .addBook(this.item().book_id, result.quantity, 'set')
-          .subscribe();
-      },
-    });
+    const quantityChangesSubscription =
+      this.quantityForm.valueChanges.subscribe({
+        next: (result: { quantity: number }) => {
+          const addBookSubscription = this.cartService
+            .addBook(this.item().book_id, result.quantity, 'set')
+            .subscribe();
+          this.subscriptions.add(addBookSubscription);
+        },
+      });
+
+    this.subscriptions.add(quantityChangesSubscription);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
   onPreventDefault(event: Event) {
@@ -39,8 +57,12 @@ export class CartItemComponent implements OnInit {
 
   onDeleteBook(event: Event): void {
     event.stopPropagation();
-    this.cartService.deleteBook(this.item().book_id).subscribe({
-      error: (err) => console.log(err),
-    });
+    const deleteBookSubscription = this.cartService
+      .deleteBook(this.item().book_id)
+      .subscribe({
+        error: (err) => console.log(err),
+      });
+
+    this.subscriptions.add(deleteBookSubscription);
   }
 }
