@@ -1,11 +1,13 @@
-import { DestroyRef, inject, Injectable, Injector } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
 import { CartService } from './cart.service';
+import { ToastrService } from 'ngx-toastr';
+import { Cart, LoginResults } from '../../types/types';
 
 @Injectable({
   providedIn: 'root',
@@ -14,9 +16,9 @@ export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
   private http = inject(HttpClient);
   private cookieService = inject(CookieService);
+  private toastr = inject(ToastrService);
   private router = inject(Router);
   private injector = inject(Injector);
-  private destroyRef = inject(DestroyRef);
 
   // using injector because two services use each other and that can cause a loop
   private _cartService?: CartService;
@@ -27,23 +29,35 @@ export class AuthService {
     return this._cartService;
   }
 
-  login(email: string, password: string): Observable<any> {
+  login(email: string, password: string): Observable<Cart> {
     return this.http
-      .post<any>(`${this.apiUrl}/login`, { email, password })
+      .post<LoginResults>(`${this.apiUrl}/login`, { email, password })
       .pipe(
-        tap((loggedUser) => {
+        tap((results) =>
+          this.toastr.success(results.message, `Hello ${results.name}`)
+        ),
+        switchMap((loggedUser) => {
           this.setSession(loggedUser);
-          const subscription = this.cartService.viewCart().subscribe();
-          this.destroyRef.onDestroy(() => subscription.unsubscribe());
+          return this.cartService.viewCart();
         })
       );
   }
 
-  register(name: string, email: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, { name, email, password });
+  register(
+    name: string,
+    email: string,
+    password: string
+  ): Observable<{ message: string }> {
+    return this.http
+      .post<{ message: string }>(`${this.apiUrl}/register`, {
+        name,
+        email,
+        password,
+      })
+      .pipe(tap((results) => this.toastr.info(results.message)));
   }
 
-  private setSession(authResult: any): void {
+  private setSession(authResult: LoginResults): void {
     const expiresAt = new Date(authResult.expiresAt || 3600);
 
     this.cookieService.set(

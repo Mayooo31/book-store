@@ -36,7 +36,7 @@ export class CartService {
     bookId: number,
     quantity: number = 1,
     operation: 'add' | 'set'
-  ): Observable<any> {
+  ): Observable<Cart | null> {
     if (!this.authService.isLoggedIn()) {
       this.toastr.error('To add items into cart you have to login...');
       return of(null);
@@ -51,13 +51,13 @@ export class CartService {
     }
 
     return this.http
-      .post<any>(`${this.apiUrl}/add`, {
+      .post<Cart | null>(`${this.apiUrl}/add`, {
         bookId,
         quantity,
         operation,
       })
       .pipe(
-        switchMap(() => this.viewCart()), // Automatically refresh the cart after adding a book
+        switchMap(() => this.viewCart()),
         catchError((error) => {
           this.toastr.error(
             'An error occurred while adding the book to the cart.'
@@ -67,9 +67,9 @@ export class CartService {
       );
   }
 
-  deleteBook(bookId: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${bookId}`).pipe(
-      switchMap(() => this.viewCart()), // Automatically refresh the cart after deleting a book
+  deleteBook(bookId: number): Observable<Cart | null> {
+    return this.http.delete<Cart | null>(`${this.apiUrl}/${bookId}`).pipe(
+      switchMap(() => this.viewCart()),
       catchError((error) => {
         this.toastr.error(
           'An error occurred while deleting the book from the cart.'
@@ -79,42 +79,41 @@ export class CartService {
     );
   }
 
-  deleteAllBooksFromCart(): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}`).pipe(
-      switchMap(() => this.viewCart()), // Automatically refresh the cart after deleting all books
-      catchError((error) => {
-        this.toastr.error('An error occurred while clearing the cart.');
-        return of(null);
-      })
+  deleteAllBooksFromCart(): Observable<Cart> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}`).pipe(
+      tap({
+        next: (results: { message: string }) =>
+          this.toastr.success(results.message),
+        error: () =>
+          this.toastr.error('An error occurred while clearing the cart.'),
+      }),
+      switchMap(() => this.viewCart())
     );
   }
 
-  viewCart(): Observable<any> {
+  viewCart(): Observable<Cart> {
     return this.http.get<Cart>(`${this.apiUrl}`).pipe(
       tap({
         next: (results) => this.cart_.set(results),
-      }),
-      catchError((error) => {
-        this.toastr.error('An error occurred while fetching the cart.');
-        return of(null);
+        error: () =>
+          this.toastr.error('An error occurred while fetching the cart.'),
       })
     );
   }
 
-  getTotalItemsInCart(): Observable<any> {
-    return this.http.get<{ total_items: string }>(`${this.apiUrl}/total-items`);
-  }
-
-  checkout(shippingAddress: string, paymentMethod: string): Observable<any> {
+  checkout(
+    shippingAddress: string,
+    paymentMethod: string
+  ): Observable<{ message: string; orderId: number }> {
     return this.http
-      .post<any>(`${this.apiUrl}/checkout`, {
+      .post<{ message: string; orderId: number }>(`${this.apiUrl}/checkout`, {
         shippingAddress,
         paymentMethod,
       })
       .pipe(
-        catchError((error) => {
-          this.toastr.error('An error occurred during checkout.');
-          return of(null);
+        tap({
+          next: (results) => this.toastr.success(results.message),
+          error: () => this.toastr.error('An error occurred during checkout.'),
         })
       );
   }

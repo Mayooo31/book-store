@@ -5,13 +5,14 @@ import {
   OnDestroy,
   signal,
   input,
+  DestroyRef,
 } from '@angular/core';
 import { OrderDetail } from '../../../../../types/types';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { CapitalizePipe } from '../../../../../core/pipes/capitalize.pipe';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DashboardService } from '../../../../dashboard/dashboard.service';
-import { Subscription } from 'rxjs';
+import { Subscription, switchMap } from 'rxjs';
 
 @Component({
   selector: 'tr[app-orders-history-item]',
@@ -20,9 +21,9 @@ import { Subscription } from 'rxjs';
   templateUrl: './orders-history-item.component.html',
   styleUrls: ['./orders-history-item.component.css'],
 })
-export class OrdersHistoryItemComponent implements OnInit, OnDestroy {
+export class OrdersHistoryItemComponent implements OnInit {
   private dashboardService = inject(DashboardService);
-  private subscriptions: Subscription = new Subscription();
+  private destroyRef = inject(DestroyRef);
 
   order = input<OrderDetail>({} as OrderDetail);
   isOnDashboard = input<boolean>(false);
@@ -36,20 +37,18 @@ export class OrdersHistoryItemComponent implements OnInit, OnDestroy {
       status: this.statusControl,
     });
 
-    const statusChangesSubscription = this.statusForm.valueChanges.subscribe({
-      next: (result: { status: string }) => {
-        const changeStatusSubscription = this.dashboardService
-          .changeStatusOfOrder(this.order().id, result.status)
-          .subscribe();
-        this.subscriptions.add(changeStatusSubscription);
-      },
-    });
+    const subscription = this.statusForm.valueChanges
+      .pipe(
+        switchMap((result: { status: string }) =>
+          this.dashboardService.changeStatusOfOrder(
+            this.order().id,
+            result.status
+          )
+        )
+      )
+      .subscribe();
 
-    this.subscriptions.add(statusChangesSubscription);
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   onPreventDefault(event: Event) {

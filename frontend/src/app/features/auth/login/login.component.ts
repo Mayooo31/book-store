@@ -47,8 +47,6 @@ export class LoginComponent {
           this.loading.set(false);
           this.error.set(error.error.message);
         },
-        next: (results) =>
-          this.toastr.success(results.message, `Hello ${results.name}`),
         complete: () => {
           this.loading.set(false);
           this.router.navigate(['/books']);

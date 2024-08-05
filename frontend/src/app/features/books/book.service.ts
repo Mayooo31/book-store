@@ -19,7 +19,7 @@ export class BookService {
   books = this.books_.asReadonly();
   book = this.book_.asReadonly();
 
-  getBooks(page: number = 1, limit: number = 20): Observable<any> {
+  getBooks(page: number = 1, limit: number = 20): Observable<GetBooksResults> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
@@ -43,17 +43,19 @@ export class BookService {
     );
   }
 
-  deleteBook(bookId: number): Observable<any> {
-    return this.http.delete<any>(`${this.dashboardUrl}/books/${bookId}`).pipe(
-      tap({
-        next: () => {
-          this.books_.update((prevBooks) =>
-            prevBooks.filter((book) => book.id !== bookId)
-          );
-          this.toastr.success('You successfully deleted book.');
-        },
-      })
-    );
+  deleteBook(bookId: number): Observable<{ message: string }> {
+    return this.http
+      .delete<{ message: string }>(`${this.dashboardUrl}/books/${bookId}`)
+      .pipe(
+        tap({
+          next: (results) => {
+            this.books_.update((prevBooks) =>
+              prevBooks.filter((book) => book.id !== bookId)
+            );
+            this.toastr.success(results.message);
+          },
+        })
+      );
   }
 
   getBooksBaseOnSearchInput(inputValue: string) {

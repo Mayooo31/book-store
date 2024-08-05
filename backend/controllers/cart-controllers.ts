@@ -117,7 +117,13 @@ export const createOrder = (
 
       const orderId = result.rows[0].p_order_id;
 
-      res.status(201).json({ message: "Order placed successfully", orderId });
+      res
+        .status(201)
+        .json({
+          message:
+            "Successfully ordered. We are already working on your order...",
+          orderId,
+        });
     }
   );
 };

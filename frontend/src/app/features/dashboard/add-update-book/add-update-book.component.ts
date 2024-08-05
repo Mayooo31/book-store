@@ -34,6 +34,7 @@ export class AddUpdateBookComponent implements OnInit, OnDestroy {
   isUpdating = this.router.url.includes('update-book');
   bookForm: FormGroup;
   error = signal('');
+  loading = signal(false);
 
   private subscriptions: Subscription = new Subscription();
 
@@ -115,18 +116,21 @@ export class AddUpdateBookComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     this.error.set('');
+    this.loading.set(true);
     if (!this.bookForm.valid) return;
 
     if (this.isUpdating) {
       const updateSubscription = this.dashboardService
         .updateBook(+this.bookId!, this.bookForm.value)
         .subscribe({
-          error: (err) => {
+          error: (error) => {
             this.error.set('Something happened. Please try again later!');
+            this.loading.set(false);
           },
-          next: (results) => {
+          next: (results) => this.toastr.success(results.message),
+          complete: () => {
             this.router.navigate(['books', this.bookId]);
-            this.toastr.success('Successfully updated a book.');
+            this.loading.set(false);
           },
         });
 
@@ -135,11 +139,17 @@ export class AddUpdateBookComponent implements OnInit, OnDestroy {
       const addSubscription = this.dashboardService
         .addBook(this.bookForm.value)
         .subscribe({
-          error: (err) =>
-            this.error.set('Something happened. Please try again later!'),
+          error: (error) => {
+            this.error.set('Something happened. Please try again later!');
+            this.loading.set(false);
+          },
+
           next: (results: { id: string }) => {
             this.router.navigate(['books', results.id]);
+          },
+          complete: () => {
             this.toastr.success('Successfully added a book.');
+            this.loading.set(false);
           },
         });
 

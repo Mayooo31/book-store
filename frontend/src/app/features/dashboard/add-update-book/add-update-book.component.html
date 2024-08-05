@@ -111,6 +111,6 @@
   </div>
 
   <button type="submit">
-    {{ isUpdating ? "Update a book" : "Add a book" }}
+    {{ loading() ? "Loading..." : isUpdating ? "Update a book" : "Add a book" }}
   </button>
 </form>

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ToastrService } from 'ngx-toastr';
-import { Genre, Statistics } from '../../types/types';
+import { Genre, GetAllOrdersResults, Statistics } from '../../types/types';
 
 @Injectable({
   providedIn: 'root',
@@ -18,40 +18,49 @@ export class DashboardService {
   statistics = this.statistics_.asReadonly();
   genres = this.genres_.asReadonly();
 
-  getAllOrders(page: number = 1, limit: number = 30): Observable<any> {
-    return this.http.get<any>(
+  getAllOrders(
+    page: number = 1,
+    limit: number = 30
+  ): Observable<GetAllOrdersResults> {
+    return this.http.get<GetAllOrdersResults>(
       `${this.apiUrl}/orders?page=${page}&limit=${limit}`
     );
   }
 
-  changeStatusOfOrder(orderId: number, status: string): Observable<any> {
+  changeStatusOfOrder(
+    orderId: number,
+    status: string
+  ): Observable<{ message: string }> {
     return this.http
-      .patch<any>(`${this.apiUrl}/orders/${orderId}/status`, {
+      .patch<{ message: string }>(`${this.apiUrl}/orders/${orderId}/status`, {
         status,
       })
       .pipe(
         tap({
-          complete: () => this.toastr.success('Status successfully changed!'),
-          error: () => this.toastr.success('Status was not changed!'),
+          next: (results) => this.toastr.success(results.message),
+          error: () => this.toastr.error('Status was not changed!'),
         })
       );
   }
 
-  addBook(book: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/books/add`, book);
+  addBook(book: any): Observable<{ id: string }> {
+    return this.http.post<{ id: string }>(`${this.apiUrl}/books/add`, book);
   }
 
-  updateBook(bookId: number, book: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/books/${bookId}`, book);
+  updateBook(bookId: number, book: any): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(
+      `${this.apiUrl}/books/${bookId}`,
+      book
+    );
   }
 
-  getStatistics() {
+  getStatistics(): Observable<Statistics> {
     return this.http
       .get<Statistics>(this.apiUrl + '/statistics')
       .pipe(tap({ next: (results) => this.statistics_.set(results) }));
   }
 
-  getGenres() {
+  getGenres(): Observable<Genre[]> {
     return this.http
       .get<Genre[]>(this.apiUrl + '/genres')
       .pipe(tap({ next: (results) => this.genres_.set(results) }));

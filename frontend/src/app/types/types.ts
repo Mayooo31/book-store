@@ -79,3 +79,19 @@ export type Genre = {
   id: number;
   genre: string;
 };
+
+export type LoginResults = {
+  email: string;
+  expiresAt: string;
+  message: string;
+  name: string;
+  role: string;
+  token: string;
+};
+
+export type GetAllOrdersResults = {
+  results: OrderDetail[];
+  totalOrders: number;
+  totalPages: number;
+  currentPage: string;
+};

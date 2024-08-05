@@ -10,7 +10,6 @@ import { Router } from '@angular/router';
 
 import { CommonModule } from '@angular/common';
 import { SharedAuthFormComponent } from '../shared-auth-form.component';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -20,7 +19,6 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['../shared-auth-form.component.css'],
 })
 export class RegisterComponent {
-  private toastr = inject(ToastrService);
   private authService = inject(AuthService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -54,7 +52,6 @@ export class RegisterComponent {
             this.loading.set(false);
             this.error.set(error.error.message);
           },
-          next: (results) => this.toastr.info(results.message),
           complete: () => {
             this.loading.set(false);
             this.router.navigate(['/login']);

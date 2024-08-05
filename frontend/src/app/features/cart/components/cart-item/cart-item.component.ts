@@ -11,7 +11,7 @@ import { CartItem } from '../../../../types/types';
 import { CurrencyPipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CartService } from '../../../../core/services/cart.service';
-import { Subscription } from 'rxjs';
+import { Subscription, switchMap } from 'rxjs';
 
 @Component({
   selector: 'tr[app-cart-item]',
@@ -34,15 +34,13 @@ export class CartItemComponent implements OnInit, OnDestroy {
       quantity: this.quantityControl,
     });
 
-    const quantityChangesSubscription =
-      this.quantityForm.valueChanges.subscribe({
-        next: (result: { quantity: number }) => {
-          const addBookSubscription = this.cartService
-            .addBook(this.item().book_id, result.quantity, 'set')
-            .subscribe();
-          this.subscriptions.add(addBookSubscription);
-        },
-      });
+    const quantityChangesSubscription = this.quantityForm.valueChanges
+      .pipe(
+        switchMap((result: { quantity: number }) =>
+          this.cartService.addBook(this.item().book_id, result.quantity, 'set')
+        )
+      )
+      .subscribe();
 
     this.subscriptions.add(quantityChangesSubscription);
   }

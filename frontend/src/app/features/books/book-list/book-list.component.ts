@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { BookService } from '../book.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaginationInfo } from '../../../types/types';
@@ -6,7 +6,7 @@ import { CurrencyPipe } from '@angular/common';
 import { BookItemComponent } from './components/book-item/book-item.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, Subscription } from 'rxjs';
+import { debounceTime, Subscription, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-book-list',
@@ -18,7 +18,6 @@ import { debounceTime, Subscription } from 'rxjs';
 export class BookListComponent implements OnInit {
   private authService = inject(AuthService);
   private bookService = inject(BookService);
-  private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   books = this.bookService.books;
@@ -49,29 +48,24 @@ export class BookListComponent implements OnInit {
         this.onGetBooks();
       }
     );
-
     this.subscriptions.push(queryParamsSubscription);
 
     const searchFormSubscription = this.searchForm.valueChanges
-      .pipe(debounceTime(500))
-      .subscribe({
-        next: (results) => {
-          const searchSubscription = this.bookService
-            .getBooksBaseOnSearchInput(results.search ?? '')
-            .subscribe({
-              next: (results) => {
-                const { currentPage, totalPages, totalBooks } = results;
-                this.paginationInfo.set({
-                  currentPage,
-                  totalPages,
-                  totalBooks,
-                });
-              },
-            });
-
-          this.subscriptions.push(searchSubscription);
-        },
-      });
+      .pipe(
+        debounceTime(300),
+        switchMap((results) =>
+          this.bookService.getBooksBaseOnSearchInput(results.search ?? '')
+        ),
+        tap((results) => {
+          const { currentPage, totalPages, totalBooks } = results;
+          this.paginationInfo.set({
+            currentPage,
+            totalPages,
+            totalBooks,
+          });
+        })
+      )
+      .subscribe();
 
     this.subscriptions.push(searchFormSubscription);
   }

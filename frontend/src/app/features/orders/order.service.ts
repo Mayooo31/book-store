@@ -17,19 +17,19 @@ export class OrderService {
   orders = this.orders_.asReadonly();
   order = this.order_.asReadonly();
 
-  getHistory(): Observable<any> {
+  getHistory(): Observable<OrderDetail[]> {
     return this.http
       .get<OrderDetail[]>(`${this.apiUrl}`)
       .pipe(tap({ next: (results) => this.orders_.set(results) }));
   }
 
-  getHistoryById(orderId: number): Observable<any> {
+  getHistoryById(orderId: number): Observable<OrderById> {
     return this.http
       .get<OrderById>(`${this.apiUrl}/${orderId}`)
       .pipe(tap({ next: (results) => this.order_.set(results) }));
   }
 
-  setAllOrdersForDashboard(orders: OrderDetail[]) {
+  setAllOrdersForDashboard(orders: OrderDetail[]): void {
     this.orders_.set(orders);
   }
 }

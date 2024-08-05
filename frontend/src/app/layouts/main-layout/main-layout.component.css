@@ -15,3 +15,9 @@ div {
     max-width: 95%;
   }
 }
+
+@media (max-width: 640px) {
+  div {
+    margin-top: 5rem;
+  }
+}

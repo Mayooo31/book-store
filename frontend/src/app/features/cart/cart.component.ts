@@ -11,8 +11,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { CartPaymentFormComponent } from './components/cart-payment-form/cart-payment-form.component';
-import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
+import { finalize, Subscription, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-cart',
@@ -29,12 +28,12 @@ import { Subscription } from 'rxjs';
 export class CartComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private cartService = inject(CartService);
-  private toastr = inject(ToastrService);
   private router = inject(Router);
   cart = this.cartService.cart;
   loading = signal<boolean>(true);
   checkoutLoading = signal<boolean>(false);
   error = signal<string>('');
+
   private subscriptions: Subscription = new Subscription();
 
   form = new FormGroup({
@@ -49,7 +48,7 @@ export class CartComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
       const cartSubscription = this.cartService.viewCart().subscribe({
-        error: (err) => {
+        error: (error) => {
           this.loading.set(false);
           this.error.set('Something happened... We could not fetch your cart.');
         },
@@ -100,21 +99,17 @@ export class CartComponent implements OnInit, OnDestroy {
 
     const checkoutSubscription = this.cartService
       .checkout(address, creditCard)
-      .subscribe({
-        next: (response) => {
-          this.router.navigate(['order/history', response.orderId]);
-          const viewCartSubscription = this.cartService.viewCart().subscribe();
-          this.subscriptions.add(viewCartSubscription);
-          this.toastr.success(
-            'Successfully ordered. We are already working on your order...'
-          );
-        },
-        error: (err) => {
-          this.checkoutLoading.set(false);
-          this.toastr.error('Something happened. Please try again later...');
-        },
-        complete: () => this.checkoutLoading.set(false),
-      });
+      .pipe(
+        switchMap((results) =>
+          this.cartService.viewCart().pipe(
+            tap(() => {
+              this.router.navigate(['order/history', results.orderId]);
+            })
+          )
+        ),
+        finalize(() => this.checkoutLoading.set(false))
+      )
+      .subscribe();
 
     this.subscriptions.add(checkoutSubscription);
   }
@@ -130,10 +125,7 @@ export class CartComponent implements OnInit, OnDestroy {
   onRemoveAllBooksFromCart() {
     const removeAllBooksSubscription = this.cartService
       .deleteAllBooksFromCart()
-      .subscribe({
-        complete: () =>
-          this.toastr.success('Successfully removed all books from cart...'),
-      });
+      .subscribe();
 
     this.subscriptions.add(removeAllBooksSubscription);
   }
