@@ -33,9 +33,9 @@ export class AuthService {
     return this.http
       .post<LoginResults>(`${this.apiUrl}/login`, { email, password })
       .pipe(
-        tap((results) =>
-          this.toastr.success(results.message, `Hello ${results.name}`)
-        ),
+        tap((results) => {
+          this.toastr.success(results.message, `Hello ${results.name}`);
+        }),
         switchMap((loggedUser) => {
           this.setSession(loggedUser);
           return this.cartService.viewCart();
@@ -58,12 +58,21 @@ export class AuthService {
   }
 
   private setSession(authResult: LoginResults): void {
-    const expiresAt = new Date(authResult.expiresAt || 3600);
+    const expiresAt = new Date(authResult.expiresAt).getTime();
 
     this.cookieService.set(
       'token',
       authResult.token,
       expiresAt,
+      '/',
+      '',
+      true,
+      'Strict'
+    );
+    this.cookieService.set(
+      'token_expiration',
+      expiresAt.toString(),
+      new Date(expiresAt),
       '/',
       '',
       true,
@@ -99,12 +108,18 @@ export class AuthService {
   }
 
   logout(): void {
-    this.cookieService.delete('token', '/');
-    this.cookieService.delete('user_name', '/');
-    this.cookieService.delete('user_email', '/');
-    this.cookieService.delete('user_role', '/');
+    this.cookieService.deleteAll();
     this.cartService.removeCart();
     this.router.navigate(['books']);
+  }
+
+  isTokenExpired(): boolean {
+    const expiration = this.cookieService.get('token_expiration');
+    if (!expiration) {
+      return true;
+    }
+    const expiresAt = parseInt(expiration, 10);
+    return new Date().getTime() > expiresAt;
   }
 
   getToken(): string {

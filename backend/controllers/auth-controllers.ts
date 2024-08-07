@@ -12,6 +12,7 @@ import {
 } from "../queries/auth-queries";
 // utils
 import createError from "../utils/error";
+import convertToMilliseconds from "../utils/convertToMilliseconds";
 
 dotenv.config();
 
@@ -87,8 +88,8 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       { expiresIn: process.env.JWT_EXPIRATION_TIME! }
     );
 
-    const expirationDate = new Date();
-    expirationDate.setSeconds(expirationDate.getSeconds() + 365 * 24 * 60 * 60); // 365 days in seconds
+    const expiresIn = convertToMilliseconds(process.env.JWT_EXPIRATION_TIME!);
+    const expirationTime = new Date(Date.now() + expiresIn).toISOString();
 
     res.status(200).json({
       message: "You have been successfully logged in. 🥳",
@@ -96,7 +97,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       email: loggedUser.email,
       token,
       role: loggedUser.role,
-      expiresAt: expirationDate.toISOString(),
+      expiresAt: expirationTime,
     });
   });
 };

@@ -5,19 +5,26 @@ import {
   HttpInterceptorFn,
   HttpRequest,
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<any>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<any>> => {
   const authService = inject(AuthService);
-  const authToken = authService.getToken();
+  const toastr = inject(ToastrService);
+
+  if (authService.isLoggedIn() && authService.isTokenExpired()) {
+    authService.logout();
+    toastr.warning('Your session has expired. Please log in again.');
+    return of();
+  }
 
   const authReq = req.clone({
     setHeaders: {
-      Authorization: `Bearer ${authToken}`,
+      Authorization: `Bearer ${authService.getToken()}`,
     },
   });
 

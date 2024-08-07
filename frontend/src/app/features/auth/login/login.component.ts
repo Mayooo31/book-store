@@ -49,7 +49,7 @@ export class LoginComponent {
         },
         complete: () => {
           this.loading.set(false);
-          this.router.navigate(['/books']);
+          this.router.navigate(['books']);
         },
       });
 

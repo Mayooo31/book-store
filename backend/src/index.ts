@@ -13,7 +13,6 @@ const app = express();
 
 // middlewares
 app.use(express.json());
-
 const corsOptions = {
   origin: "*",
   credentials: true,

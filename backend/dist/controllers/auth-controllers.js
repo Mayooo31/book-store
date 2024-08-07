@@ -21,6 +21,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const auth_queries_1 = require("../queries/auth-queries");
 // utils
 const error_1 = __importDefault(require("../utils/error"));
+const convertToMilliseconds_1 = __importDefault(require("../utils/convertToMilliseconds"));
 dotenv_1.default.config();
 const register = (req, res, next) => {
     const { name, email, password } = req.body;
@@ -57,15 +58,15 @@ const login = (req, res, next) => {
             email: loggedUser.email,
             role: loggedUser.role,
         }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION_TIME });
-        const expirationDate = new Date();
-        expirationDate.setSeconds(expirationDate.getSeconds() + 365 * 24 * 60 * 60); // 365 days in seconds
+        const expiresIn = (0, convertToMilliseconds_1.default)(process.env.JWT_EXPIRATION_TIME);
+        const expirationTime = new Date(Date.now() + expiresIn).toISOString();
         res.status(200).json({
             message: "You have been successfully logged in. 🥳",
             name: loggedUser.name,
             email: loggedUser.email,
             token,
             role: loggedUser.role,
-            expiresAt: expirationDate.toISOString(),
+            expiresAt: expirationTime,
         });
     }));
 };
