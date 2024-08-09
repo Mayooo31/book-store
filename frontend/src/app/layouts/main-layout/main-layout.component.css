@@ -1,0 +1,23 @@
+div {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+@media (max-width: 1300px) {
+  div {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 1000px) {
+  div {
+    max-width: 95%;
+  }
+}
+
+@media (max-width: 640px) {
+  div {
+    margin-top: 5rem;
+  }
+}

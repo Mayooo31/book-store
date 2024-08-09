@@ -1,0 +1,45 @@
+@if(isOnDashboard) {
+<h1 class="title">Last 30 orders!</h1>
+}
+<!--  -->
+@else {
+<h1 class="title">Your orders history!</h1>
+}
+<!--  -->
+@if(loading()){
+<p class="main-loading">Loading...</p>
+}
+<!--  -->
+@else if(error()){
+<p class="main-error">{{ error() }}</p>
+}
+<!--  -->
+@else {
+<div class="orders">
+  @if(orders().length === 0){
+  <div class="no-items">
+    <span class="material-symbols-outlined"> shopping_cart </span>
+    <h2>No orders yet... Order something :)</h2>
+  </div>
+  }
+  <!--  -->
+  @else {
+  <table>
+    <tr class="titles">
+      <th>Order id</th>
+      <th>Status</th>
+      <th>Price</th>
+      <th>Ordered at</th>
+    </tr>
+    @for (order of orders(); track order.id){
+    <tr
+      [isOnDashboard]="isOnDashboard"
+      app-orders-history-item
+      [order]="order"
+      (click)="onGetOrderById(order.id)"
+    ></tr>
+    }
+  </table>
+  }
+</div>
+}

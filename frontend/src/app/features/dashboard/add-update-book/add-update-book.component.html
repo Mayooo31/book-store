@@ -1,0 +1,116 @@
+@if(isUpdating){
+<h1 class="title">Update a book</h1>
+} @else {
+<h1 class="title">Add a book</h1>
+}
+
+<form class="form-container" [formGroup]="bookForm" (ngSubmit)="onSubmit()">
+  <div class="form-item" [ngClass]="{ invalid: getValidity('title') }">
+    <label for="title">Title:</label>
+    <input id="title" formControlName="title" />
+    @if(getValidity('title')){
+    <p class="error">Title is required</p>
+    }
+  </div>
+
+  <!-- Author Input Group -->
+  <div class="form-item" [ngClass]="{ invalid: getValidity('author') }">
+    <label for="author">Author:</label>
+    <input id="author" formControlName="author" />
+    @if(getValidity('author')){
+    <p class="error">Author is required</p>
+    }
+  </div>
+
+  <!-- Description Input Group -->
+  <div class="form-item" [ngClass]="{ invalid: getValidity('description') }">
+    <label for="description">Description:</label>
+    <textarea id="description" formControlName="description"></textarea>
+    @if(getValidity('description')){
+    <p class="error">Description needs to have at least 50 characters.</p>
+    }
+  </div>
+
+  <!-- Price Input Group -->
+  <div class="form-item" [ngClass]="{ invalid: getValidity('price') }">
+    <label for="price">Price:</label>
+    <input id="price" type="number" formControlName="price" />
+    @if(getValidity('price')){
+    <p class="error">Minimum price is $5.00.</p>
+    }
+  </div>
+
+  <!-- Year Published Input Group -->
+  <div class="form-item" [ngClass]="{ invalid: getValidity('yearPublished') }">
+    <label for="yearPublished">Year Published:</label>
+    <input id="yearPublished" type="number" formControlName="yearPublished" />
+    @if(getValidity('yearPublished')){
+    <p class="error">Year must be 1900 or later</p>
+    }
+  </div>
+
+  <!-- Cover Image URL Input Group -->
+  <div class="form-item" [ngClass]="{ invalid: getValidity('coverImage') }">
+    <label for="coverImage">Cover Image URL:</label>
+    <input id="coverImage" formControlName="coverImage" />
+    @if(getValidity('coverImage')){
+    <p class="error">Cover image URL is required</p>
+    }
+  </div>
+
+  <!-- Pages Input Group -->
+  <div class="form-item" [ngClass]="{ invalid: getValidity('pages') }">
+    <label for="pages">Pages:</label>
+    <input id="pages" type="number" formControlName="pages" />
+    @if(getValidity('pages')){
+    <p class="error">Pages must be at least 1</p>
+    }
+  </div>
+
+  <!-- Rating Input Group -->
+  <div class="form-item" [ngClass]="{ invalid: getValidity('rating') }">
+    <label for="rating">Rating:</label>
+    <input
+      id="rating"
+      type="number"
+      step="0.1"
+      min="0"
+      max="5"
+      formControlName="rating"
+    />
+    @if(getValidity('rating')){
+    <p class="error">Rating must be between 0 and 5</p>
+    }
+  </div>
+
+  <!-- Is Available Input Group -->
+  <div class="form-item checkbox">
+    <label for="isAvailable">Is Available:</label>
+    <label class="container">
+      <input id="isAvailable" type="checkbox" formControlName="isAvailable" />
+      <span class="checkmark"></span>
+    </label>
+  </div>
+
+  <div class="form-item">
+    <label>Genres:</label>
+    @if(bookForm.get('genres')?.invalid){
+    <p class="error">Must select between 1 and 3 genres.</p>
+    }
+    <div class="genres">
+      @for (genre of genres(); track genre.id) {
+      <div
+        (click)="toggleGenre(genre.id)"
+        [ngClass]="{ 'selected-genre': isGenreSelected(genre.id) }"
+        class="genre-item"
+      >
+        {{ genre.genre }}
+      </div>
+      }
+    </div>
+  </div>
+
+  <button type="submit">
+    {{ loading() ? "Loading..." : isUpdating ? "Update a book" : "Add a book" }}
+  </button>
+</form>

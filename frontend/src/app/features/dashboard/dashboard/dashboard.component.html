@@ -1,0 +1,43 @@
+<h1 class="title">Statistics for last month</h1>
+
+@if(loading()) {
+<p class="main-loading">Loading...</p>
+}
+<!--  -->
+@else if(error()) {
+<p>{{ error() }}</p>
+}
+<!--  -->
+@else {
+<div class="statistics">
+  <div>
+    <h2>Orders</h2>
+    <p>
+      <span>{{ statistics().number_of_orders_last_month }}</span>
+      orders
+    </p>
+  </div>
+  <div>
+    <h2>Customers</h2>
+    <p>
+      <span>{{ statistics().number_of_customers_last_month }}</span>
+      customers
+    </p>
+  </div>
+  <div>
+    <h2>Books in database</h2>
+    <p>
+      <span>{{ statistics().total_books_count }}</span>
+      books
+    </p>
+  </div>
+  <div>
+    <h2>Profit from sales</h2>
+    <p>
+      <span>{{ statistics().total_sales_last_month | currency }}</span>
+    </p>
+  </div>
+</div>
+}
+
+<app-orders-history />

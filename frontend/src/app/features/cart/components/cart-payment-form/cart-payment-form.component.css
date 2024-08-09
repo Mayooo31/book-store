@@ -1,0 +1,62 @@
+form {
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-radius: 2rem;
+}
+
+form div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.1rem;
+}
+
+form input {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+form input,
+.pay-button {
+  background: #ffb9a7;
+  color: #428257;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+}
+
+form label {
+  text-align: left;
+}
+
+.pay-button {
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid #ffb9a7;
+}
+
+.pay-button:hover {
+  background: #f4ad9b;
+}
+
+.pay-button:active {
+  background-color: #428257;
+  color: #ffb9a7;
+}
+
+.error {
+  color: #ed7c74;
+  text-align: left;
+  font-size: 0.8rem;
+}
+
+form div:has(.ng-invalid.ng-touched.ng-dirty) label {
+  color: #ed7c74;
+}
+
+input.ng-invalid.ng-touched.ng-dirty,
+textarea.ng-invalid.ng-touched.ng-dirty {
+  background-color: #ed7c74;
+}

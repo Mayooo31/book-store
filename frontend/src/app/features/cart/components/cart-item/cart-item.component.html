@@ -1,0 +1,32 @@
+<td>{{ item().book_id }}</td>
+<td class="image"><img [src]="item().cover_image" alt="" /></td>
+<td class="title-small">{{ item().title }}</td>
+<td>{{ item().price | currency }}</td>
+<td>{{ item().quantity }}</td>
+<td>{{ +item().price * +item().quantity | currency }}</td>
+<td>
+  <form [formGroup]="quantityForm">
+    <select
+      name="quantity"
+      id="quantity"
+      [formControl]="quantityControl"
+      (click)="onPreventDefault($event)"
+    >
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+    </select>
+  </form>
+</td>
+<td class="icon">
+  <span (click)="onDeleteBook($event)" class="material-symbols-outlined">
+    delete
+  </span>
+</td>

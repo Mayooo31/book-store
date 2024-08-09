@@ -1,0 +1,134 @@
+header {
+  padding: 30px 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand img {
+  height: 50px;
+  border-radius: 50%;
+}
+
+.brand h1 {
+  font-size: 1.8rem;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.navbar ul li {
+  display: flex;
+}
+
+.navbar ul li a {
+  text-decoration: none;
+  padding: 5px 10px;
+  transition: background-color 0.2s;
+  border-radius: 3px;
+}
+
+.navbar ul li a:hover {
+  background: #479060;
+  color: #ffb9a7;
+  cursor: pointer;
+}
+
+.icon:hover {
+  background: transparent !important;
+}
+
+.icon {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+}
+
+.icon span {
+  position: absolute;
+  transition: all 0.2s ease;
+  top: 2px;
+  right: 2px;
+  background: #428257;
+  color: #ffb9a7;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  text-align: center;
+  transform: translate(50%, -50%);
+}
+
+.icon:hover span {
+  background: #479060;
+  scale: 1.1;
+}
+
+.active {
+  background: #428257;
+  color: #ffb9a7;
+}
+
+.hamburger {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .brand h1 {
+    font-size: 1.4rem;
+  }
+}
+@media (max-width: 800px) {
+  header.open {
+    display: flex;
+  }
+  header {
+    display: none;
+    z-index: 10;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: min-content;
+    align-items: start;
+    gap: 1.4rem;
+    padding: 25px;
+    color: #479060;
+    background-color: #f8b5a5;
+    border-bottom: 5px solid #479060;
+  }
+  .navbar ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .hamburger {
+    position: fixed;
+    display: block;
+    top: 1.6rem;
+    right: 1.6rem;
+    z-index: 11;
+  }
+  .hamburger span {
+    font-size: 3rem;
+  }
+  .line {
+    display: none;
+  }
+}

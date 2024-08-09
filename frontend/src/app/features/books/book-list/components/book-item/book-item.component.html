@@ -1,0 +1,25 @@
+<div class="book-item" (click)="onGetBookById(book().id)">
+  <img
+    [src]="book().cover_image ? book().cover_image : 'assets/logo.png'"
+    alt="{{ book().title }} cover image"
+  />
+  <div class="info">
+    <h3>{{ book().title }}</h3>
+    <p>by: {{ book().author }}</p>
+    <div class="price_stock">
+      <p>
+        Price: <span>{{ book().price | currency }}</span>
+      </p>
+      <p>{{ book().is_available ? "In stock" : "Out of stock" }}</p>
+    </div>
+    @if(isAdminManageBooks()){
+    <div class="dashboard-buttons">
+      <button class="update" (click)="goToUpdatePage($event)">update</button>
+      <button class="delete" (click)="onDeleteBook($event)">delete</button>
+    </div>
+    }@else {
+    <button [disabled]="!book().is_available" (click)="onAddToCart($event)">
+      {{ loading() ? "ADDING..." : "ADD TO CART" }}</button
+    >}
+  </div>
+</div>

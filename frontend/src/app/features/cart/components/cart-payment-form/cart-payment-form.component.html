@@ -1,0 +1,24 @@
+<form [formGroup]="form()" (submit)="onSubmit()">
+  <div>
+    <label for="address">Address:</label>
+    @if(getValidity('address')){
+    <p class="error">Address has to be at least 6 characters long.</p>
+    }
+    <input type="text" id="address" formControlName="address" />
+  </div>
+  <div>
+    <label for="credit-card">Credit card:</label>
+    @if(getValidity('credit-card')){
+    <p class="error">Card must have 16 digits.</p>
+    }
+    <input
+      placeholder="3482-****-7536-1692"
+      type="text"
+      id="credit-card"
+      formControlName="credit-card"
+    />
+  </div>
+  <button class="pay-button">
+    {{ checkoutLoading() ? "Ordering..." : "Pay & order" }}
+  </button>
+</form>

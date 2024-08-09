@@ -1,0 +1,76 @@
+<h1 class="title">Your cart!</h1>
+
+@if(isLoggedIn()){
+<!--  -->
+@if(loading()){
+<p class="main-loading">Loading...</p>
+}
+<!--  -->
+@else if(error()){
+<p class="main-error">{{ error() }}</p>
+}
+<!--  -->
+@else {
+<div class="cart">
+  <!--  -->
+  @if(cart().items.length === 0){
+  <div class="no-items">
+    <span class="material-symbols-outlined"> shopping_cart </span>
+    <h2>No items in cart... Add something :)</h2>
+  </div>
+  }
+  <!--  -->
+  @else {
+  <table>
+    <tr class="titles">
+      <th>Book id</th>
+      <th>Cover img</th>
+      <th>Title</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Subtotal</th>
+    </tr>
+    @for (item of cart().items; track item.book_id){
+    <tr
+      class="tr-item"
+      app-cart-item
+      [item]="item"
+      (click)="onGetBookById(item.book_id)"
+    ></tr>
+    }
+  </table>
+  <div class="delete-books-icon">
+    <span
+      (click)="onRemoveAllBooksFromCart()"
+      class="material-symbols-outlined"
+    >
+      delete
+    </span>
+  </div>
+  <div class="line"></div>
+  <div class="billing-address">
+    <app-cart-payment-form
+      [checkoutLoading]="checkoutLoading()"
+      [form]="form"
+      (formSubmit)="onCheckout()"
+    />
+    <div class="billing-summary">
+      <p>
+        Subtotal: <span>{{ this.cart().subtotal_price | currency }}</span>
+      </p>
+      <p>
+        Fees: <span>{{ this.cart().service_fee | currency }}</span>
+      </p>
+      <p>
+        Shipping: <span>{{ this.cart().shipping | currency }}</span>
+      </p>
+      <p class="total">
+        Total: <span>{{ this.cart().total_price | currency }}</span>
+      </p>
+    </div>
+  </div>
+  }
+</div>
+} } @else {
+<p class="error">Log in and you will see your cart... :)</p>
+}

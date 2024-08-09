@@ -1,0 +1,79 @@
+.book-item {
+  background-color: #428257;
+  color: #ffb9a7;
+  padding: 15px;
+  border-radius: 1rem;
+  display: flex;
+  gap: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.book-item:hover {
+  background-color: #4f9165;
+}
+
+.book-item img {
+  width: 100px;
+  height: 160px;
+  border-radius: 0.6rem;
+  object-fit: cover;
+}
+
+.info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.price_stock {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.price_stock p span {
+  font-weight: 600;
+}
+
+button {
+  background-color: #ffb9a7;
+  color: #428257;
+  padding: 5px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  border-radius: 0.5rem;
+  border: 3px solid #ffb9a7;
+}
+
+button:hover {
+  background-color: #fbb09d;
+}
+
+button:active {
+  background-color: #428257;
+  color: #ffb9a7;
+}
+
+.dashboard-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.dashboard-buttons button {
+  width: 45%;
+}
+
+.delete {
+  color: rgb(150, 60, 60);
+}
+.update {
+  color: rgb(77, 103, 255);
+}
+
+button:disabled {
+  color: #ff6969;
+}

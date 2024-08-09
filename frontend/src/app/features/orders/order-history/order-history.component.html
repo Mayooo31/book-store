@@ -1,0 +1,45 @@
+@if(loading()){
+<p class="main-loading">Loading...</p>
+} @else if(error()){
+<p class="main-error">{{ error() }}</p>
+} @else {
+<h1>Order number. {{ order().order_id }}</h1>
+
+<div class="order">
+  <div class="status-created">
+    <p>
+      Status: <span>{{ order().status | capitalize }}</span>
+    </p>
+    <p>
+      Ordered: <span>{{ order().created_at | date : "short" }}</span>
+    </p>
+  </div>
+
+  <h2>Ordered items:</h2>
+  <table>
+    <tr>
+      <th>Book id</th>
+      <th>Title</th>
+      <th>Price</th>
+      <th>Quantity</th>
+    </tr>
+    @for (item of order().items; track item.book_id){
+    <tr>
+      <td>{{ item.book_id }}</td>
+      <td class="title-small">{{ item.title }}</td>
+      <td>{{ item.price }}</td>
+      <td>{{ item.quantity }}</td>
+    </tr>
+    }
+  </table>
+  <div class="payment-price">
+    <p>
+      Payment: <span>{{ order().payment }}</span>
+    </p>
+    <p>
+      Total price <span>{{ order().total_price | currency }}</span>
+    </p>
+  </div>
+</div>
+
+}

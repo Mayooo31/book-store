@@ -1,0 +1,46 @@
+@if(loading()){
+<p class="main-loading">Loading...</p>
+} @else if(error()){
+<p class="main-error">{{ error() }}</p>
+} @else {
+<h1 class="title">{{ book().title }}</h1>
+
+<div class="book">
+  <div>
+    <img
+      [src]="book() ? book().cover_image : 'assets/logo.png'"
+      alt="{{ book().title }} cover image"
+    />
+  </div>
+  <div class="info">
+    <div class="info-top">
+      <h2>by: {{ book().author }}</h2>
+      <p class="description">Overview: {{ book().description }}</p>
+      <div class="pages_year">
+        <p>
+          Pages: <span>{{ book().pages }}</span>
+        </p>
+        <p>
+          Published: <span>{{ book().year_published }}</span>
+        </p>
+      </div>
+      <p class="rating">
+        {{ book().rating }}
+        <span class="material-symbols-outlined star"> star </span>
+      </p>
+    </div>
+    <div class="info-bottom">
+      <div class="price_stock">
+        <p>{{ book().is_available ? "In stock" : "Out of stock" }}</p>
+        <p>
+          Price: <span>{{ book().price | currency }}</span>
+        </p>
+      </div>
+      <button (click)="onAddToCart()" [disabled]="!book().is_available">
+        {{ addBookLoading() ? "ADDING..." : "ADD TO CART" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+}
