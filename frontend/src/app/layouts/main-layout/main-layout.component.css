@@ -16,7 +16,7 @@ div {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 800px) {
   div {
     margin-top: 5rem;
   }

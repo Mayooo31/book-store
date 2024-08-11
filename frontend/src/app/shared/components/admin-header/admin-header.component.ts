@@ -8,7 +8,7 @@ import { CloseNavbarDirective } from '../../../core/directives/toggle-navbar.dir
   standalone: true,
   imports: [RouterLink, RouterLinkActive, CloseNavbarDirective],
   templateUrl: './admin-header.component.html',
-  styleUrl: './admin-header.component.css',
+  styleUrl: '../shared-header.component.css',
 })
 export class AdminHeaderComponent {
   private headerService = inject(HeaderService);

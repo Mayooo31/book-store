@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [RouterLink, RouterLinkActive, CloseNavbarDirective],
   templateUrl: './general-header.component.html',
-  styleUrls: ['./general-header.component.css'],
+  styleUrls: ['../shared-header.component.css'],
 })
 export class GeneralHeaderComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);

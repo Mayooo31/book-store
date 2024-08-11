@@ -1,19 +1,38 @@
-header {
-  padding: 30px 10px;
-  max-width: 1000px;
+.container {
+  padding: 30px 30px;
   margin: 0 auto;
-  margin-top: 5px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  align-items: center;
-}
-
-header div {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: #ffb9a7;
+  border-bottom: #428257 1px solid;
+  z-index: 100;
+  margin-bottom: 2rem;
 }
 
-h1 {
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 1000px;
+  margin: 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand img {
+  height: 50px;
+  border-radius: 50%;
+}
+
+.brand h1 {
   font-size: 1.8rem;
 }
 
@@ -22,7 +41,11 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 15px;
+}
+
+.navbar ul li {
+  display: flex;
 }
 
 .navbar ul li a {
@@ -36,6 +59,35 @@ h1 {
   background: #479060;
   color: #ffb9a7;
   cursor: pointer;
+}
+
+.icon {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+}
+
+.icon span {
+  position: absolute;
+  transition: all 0.2s ease;
+  top: 2px;
+  right: 2px;
+  background: #428257;
+  color: #ffb9a7;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  text-align: center;
+  transform: translate(50%, -50%);
+}
+
+.icon:hover {
+  background: transparent !important;
+}
+
+.icon:hover span {
+  background: #479060;
+  scale: 1.1;
 }
 
 .active {
@@ -52,12 +104,19 @@ h1 {
     font-size: 1.4rem;
   }
 }
+
 @media (max-width: 800px) {
-  header.open {
+  .container.open {
     display: flex;
   }
-  header {
+
+  .container {
+    padding: 0px;
     display: none;
+    border-bottom: #428257 0px solid;
+  }
+
+  header {
     z-index: 10;
     flex-direction: column;
     position: fixed;
@@ -70,8 +129,9 @@ h1 {
     padding: 25px;
     color: #479060;
     background-color: #f8b5a5;
-    border-bottom: 5px solid #479060;
+    border-bottom: 3px solid #479060;
   }
+
   .navbar ul {
     list-style: none;
     display: flex;
@@ -80,22 +140,32 @@ h1 {
     justify-content: center;
     gap: 1rem;
   }
+
   .hamburger {
     position: fixed;
     display: block;
     top: 1.6rem;
     right: 1.6rem;
     z-index: 11;
+    background-color: #61ae7c;
+    border-radius: 0.4rem;
+    padding: 0.4rem 0.5rem 0rem 0.5rem;
+
+    color: #f8b5a5;
   }
+
   .hamburger span {
     font-size: 3rem;
   }
+
   .line {
     display: none;
   }
+
   header > div:first-of-type {
     order: -1; /* Move this div to the first position */
   }
+
   .navbar {
     order: 1; /* Ensure navbars come after the first div */
   }
