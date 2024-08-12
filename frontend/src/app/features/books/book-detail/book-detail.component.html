@@ -6,12 +6,19 @@
 <h1 class="title">{{ book().title }}</h1>
 
 <div class="book">
+  <div class="genres">
+    @for (genre of book().genres; track genre) {
+    <p>{{ genre }}</p>
+    }
+  </div>
+
   <div>
     <img
       [src]="book() ? book().cover_image : 'assets/logo.png'"
       alt="{{ book().title }} cover image"
     />
   </div>
+
   <div class="info">
     <div class="info-top">
       <h2>by: {{ book().author }}</h2>

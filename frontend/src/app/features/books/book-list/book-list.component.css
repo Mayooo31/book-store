@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: end;
-  margin-bottom: 10px;
+  margin-bottom: 1.6rem;
 }
 
 .pagination-info input {
@@ -21,7 +21,7 @@
 .books-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 2rem 1rem;
   justify-content: center;
 }
 

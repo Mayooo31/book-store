@@ -1,8 +1,15 @@
 <div class="book-item" (click)="onGetBookById(book().id)">
+  <div class="genres">
+    @for (genre of book().genres; track genre) {
+    <p>{{ genre }}</p>
+    }
+  </div>
+
   <img
     [src]="book().cover_image ? book().cover_image : 'assets/logo.png'"
     alt="{{ book().title }} cover image"
   />
+
   <div class="info">
     <h3>{{ book().title }}</h3>
     <p>by: {{ book().author }}</p>

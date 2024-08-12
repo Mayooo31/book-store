@@ -2,7 +2,7 @@ import { Directive, HostListener, ElementRef, Renderer2 } from '@angular/core';
 import { HeaderService } from '../services/header.service';
 
 @Directive({
-  selector: 'a[closeNavbar]',
+  selector: '[closeNavbar]',
   standalone: true,
 })
 export class CloseNavbarDirective {

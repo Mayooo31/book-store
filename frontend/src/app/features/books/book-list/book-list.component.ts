@@ -1,4 +1,11 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { BookService } from '../book.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaginationInfo } from '../../../types/types';
@@ -32,6 +39,12 @@ export class BookListComponent implements OnInit {
   searchForm = new FormGroup({
     search: new FormControl(''),
   });
+
+  constructor() {
+    effect(() => {
+      console.log(this.books());
+    });
+  }
 
   ngOnInit(): void {
     this.searchForm.valueChanges

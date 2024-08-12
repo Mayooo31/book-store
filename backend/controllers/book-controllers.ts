@@ -21,6 +21,7 @@ export const getBooks = (
 
   pool.query(getBooksQuery, [+limit, offset], (error, results) => {
     if (error) {
+      console.log(error);
       return next(
         createError(
           500,
