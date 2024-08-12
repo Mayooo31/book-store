@@ -1,18 +1,11 @@
-import {
-  Component,
-  inject,
-  OnInit,
-  OnDestroy,
-  signal,
-  input,
-  DestroyRef,
-} from '@angular/core';
+import { Component, inject, OnInit, input, DestroyRef } from '@angular/core';
 import { OrderDetail } from '../../../../../types/types';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { CapitalizePipe } from '../../../../../core/pipes/capitalize.pipe';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DashboardService } from '../../../../dashboard/dashboard.service';
-import { Subscription, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'tr[app-orders-history-item]',
@@ -37,18 +30,17 @@ export class OrdersHistoryItemComponent implements OnInit {
       status: this.statusControl,
     });
 
-    const subscription = this.statusForm.valueChanges
+    this.statusForm.valueChanges
       .pipe(
         switchMap((result: { status: string }) =>
           this.dashboardService.changeStatusOfOrder(
             this.order().id,
             result.status
           )
-        )
+        ),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
-
-    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   onPreventDefault(event: Event) {

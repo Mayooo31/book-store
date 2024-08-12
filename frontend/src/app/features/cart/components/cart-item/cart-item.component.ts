@@ -1,17 +1,10 @@
-import {
-  Component,
-  inject,
-  Input,
-  OnInit,
-  OnDestroy,
-  signal,
-  input,
-} from '@angular/core';
+import { Component, inject, OnInit, input, DestroyRef } from '@angular/core';
 import { CartItem } from '../../../../types/types';
 import { CurrencyPipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CartService } from '../../../../core/services/cart.service';
-import { Subscription, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'tr[app-cart-item]',
@@ -20,9 +13,9 @@ import { Subscription, switchMap } from 'rxjs';
   templateUrl: './cart-item.component.html',
   styleUrls: ['./cart-item.component.css'],
 })
-export class CartItemComponent implements OnInit, OnDestroy {
+export class CartItemComponent implements OnInit {
   private cartService = inject(CartService);
-  private subscriptions: Subscription = new Subscription();
+  private destroyRef = inject(DestroyRef);
   item = input<CartItem>({} as CartItem);
 
   quantityForm!: FormGroup;
@@ -34,19 +27,14 @@ export class CartItemComponent implements OnInit, OnDestroy {
       quantity: this.quantityControl,
     });
 
-    const quantityChangesSubscription = this.quantityForm.valueChanges
+    this.quantityForm.valueChanges
       .pipe(
         switchMap((result: { quantity: number }) =>
           this.cartService.addBook(this.item().book_id, result.quantity, 'set')
-        )
+        ),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
-
-    this.subscriptions.add(quantityChangesSubscription);
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
   }
 
   onPreventDefault(event: Event) {
@@ -55,10 +43,9 @@ export class CartItemComponent implements OnInit, OnDestroy {
 
   onDeleteBook(event: Event): void {
     event.stopPropagation();
-    const deleteBookSubscription = this.cartService
+    this.cartService
       .deleteBook(this.item().book_id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
-
-    this.subscriptions.add(deleteBookSubscription);
   }
 }

@@ -1,12 +1,20 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { Book } from '../../../../../types/types';
 import { CurrencyPipe } from '@angular/common';
 import { CartService } from '../../../../../core/services/cart.service';
 import { Router } from '@angular/router';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { BookService } from '../../../book.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-book-item',
@@ -19,6 +27,7 @@ export class BookItemComponent implements OnInit {
   private bookService = inject(BookService);
   private authService = inject(AuthService);
   private cartService = inject(CartService);
+  private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   private addToCartSubject = new Subject<{
     bookId: number;
@@ -26,10 +35,8 @@ export class BookItemComponent implements OnInit {
   book = input<Book>({} as Book);
   loading = signal(false);
 
-  private subscriptions: Subscription[] = [];
-
   ngOnInit() {
-    const addBookSubscription = this.addToCartSubject
+    this.addToCartSubject
       .pipe(
         debounceTime(300),
         switchMap(({ bookId }) =>
@@ -39,10 +46,10 @@ export class BookItemComponent implements OnInit {
               complete: () => this.loading.set(false),
             })
           )
-        )
+        ),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
-    this.subscriptions.push(addBookSubscription);
   }
 
   onAddToCart(event: Event): void {
@@ -57,10 +64,10 @@ export class BookItemComponent implements OnInit {
 
   onDeleteBook(event: Event) {
     event.stopPropagation();
-    const deleteBookSubscription = this.bookService
+    this.bookService
       .deleteBook(this.book().id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
-    this.subscriptions.push(deleteBookSubscription);
   }
 
   goToUpdatePage(event: Event) {
@@ -70,9 +77,5 @@ export class BookItemComponent implements OnInit {
 
   isAdminManageBooks() {
     return this.authService.isAdminManageBooks();
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 }

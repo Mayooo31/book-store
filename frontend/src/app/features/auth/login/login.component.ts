@@ -8,7 +8,7 @@ import {
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 import { SharedAuthFormComponent } from '../shared-auth-form.component';
-import { ToastrService } from 'ngx-toastr';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +18,6 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['../shared-auth-form.component.css'],
 })
 export class LoginComponent {
-  private toastr = inject(ToastrService);
   private authService = inject(AuthService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -42,18 +41,19 @@ export class LoginComponent {
     const { email, password } = this.form.value;
 
     if (email && password) {
-      const subscription = this.authService.login(email, password).subscribe({
-        error: (error) => {
-          this.loading.set(false);
-          this.error.set(error.error.message);
-        },
-        complete: () => {
-          this.loading.set(false);
-          this.router.navigate(['books']);
-        },
-      });
-
-      this.destroyRef.onDestroy(() => subscription.unsubscribe());
+      this.authService
+        .login(email, password)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          error: (error) => {
+            this.loading.set(false);
+            this.error.set(error.error.message);
+          },
+          complete: () => {
+            this.loading.set(false);
+            this.router.navigate(['books']);
+          },
+        });
     }
   }
 }

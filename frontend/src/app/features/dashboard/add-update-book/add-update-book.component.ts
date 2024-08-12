@@ -1,4 +1,11 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  signal,
+  DestroyRef,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -13,7 +20,8 @@ import { BookService } from '../../books/book.service';
 import { Book } from '../../../types/types';
 import { minSelectedGenres } from '../../../validators';
 import { ToastrService } from 'ngx-toastr';
-import { Subscription } from 'rxjs';
+import { pipe, Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-add-update-book',
@@ -22,7 +30,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './add-update-book.component.html',
   styleUrls: ['./add-update-book.component.css'],
 })
-export class AddUpdateBookComponent implements OnInit, OnDestroy {
+export class AddUpdateBookComponent implements OnInit {
   private dashboardService = inject(DashboardService);
   private bookService = inject(BookService);
   private route = inject(ActivatedRoute);
@@ -30,13 +38,12 @@ export class AddUpdateBookComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private toastr = inject(ToastrService);
+  private destroyRef = inject(DestroyRef);
   genres = this.dashboardService.genres;
   isUpdating = this.router.url.includes('update-book');
   bookForm: FormGroup;
   error = signal('');
   loading = signal(false);
-
-  private subscriptions: Subscription = new Subscription();
 
   constructor() {
     this.bookForm = this.fb.group({
@@ -56,12 +63,15 @@ export class AddUpdateBookComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     window.scrollTo(0, 0);
 
-    const genresSubscription = this.dashboardService.getGenres().subscribe();
-    this.subscriptions.add(genresSubscription);
+    this.dashboardService
+      .getGenres()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
 
     if (this.isUpdating) {
-      const bookSubscription = this.bookService
+      this.bookService
         .getBookById(+this.bookId!)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (results: Book) => {
             this.bookForm.patchValue({
@@ -85,13 +95,7 @@ export class AddUpdateBookComponent implements OnInit, OnDestroy {
             });
           },
         });
-
-      this.subscriptions.add(bookSubscription);
     }
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
   }
 
   getValidity(controlName: string): boolean {
@@ -117,11 +121,16 @@ export class AddUpdateBookComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     this.error.set('');
     this.loading.set(true);
-    if (!this.bookForm.valid) return;
+
+    if (!this.bookForm.valid) {
+      this.loading.set(false);
+      return;
+    }
 
     if (this.isUpdating) {
-      const updateSubscription = this.dashboardService
+      this.dashboardService
         .updateBook(+this.bookId!, this.bookForm.value)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           error: (error) => {
             this.error.set('Something happened. Please try again later!');
@@ -133,11 +142,10 @@ export class AddUpdateBookComponent implements OnInit, OnDestroy {
             this.loading.set(false);
           },
         });
-
-      this.subscriptions.add(updateSubscription);
     } else {
-      const addSubscription = this.dashboardService
+      this.dashboardService
         .addBook(this.bookForm.value)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           error: (error) => {
             this.error.set('Something happened. Please try again later!');
@@ -152,8 +160,6 @@ export class AddUpdateBookComponent implements OnInit, OnDestroy {
             this.loading.set(false);
           },
         });
-
-      this.subscriptions.add(addSubscription);
     }
   }
 }

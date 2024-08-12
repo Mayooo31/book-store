@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, ResolveFn } from '@angular/router';
 import { BookService } from '../book.service';
 import { CurrencyPipe } from '@angular/common';
@@ -8,12 +8,12 @@ import {
   map,
   of,
   Subject,
-  Subscription,
   switchMap,
   tap,
 } from 'rxjs';
 import { CartService } from '../../../core/services/cart.service';
 import { Book } from '../../../types/types';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-book-detail',
@@ -22,9 +22,10 @@ import { Book } from '../../../types/types';
   templateUrl: './book-detail.component.html',
   styleUrls: ['./book-detail.component.css'],
 })
-export class BookDetailComponent implements OnInit, OnDestroy {
+export class BookDetailComponent implements OnInit {
   private cartService = inject(CartService);
   private bookService = inject(BookService);
+  private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   private bookId = this.route.snapshot.paramMap.get('bookId');
   private addToCartSubject = new Subject<{
@@ -35,14 +36,13 @@ export class BookDetailComponent implements OnInit, OnDestroy {
   addBookLoading = signal<boolean>(false);
   error = signal<string>('');
 
-  private subscriptions: Subscription[] = [];
-
   ngOnInit(): void {
     this.error.set('');
     this.loading.set(true);
 
-    const getBookSubscription = this.bookService
+    this.bookService
       .getBookById(+this.bookId!)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         error: (error) => {
           this.error.set(error.error.message);
@@ -51,11 +51,7 @@ export class BookDetailComponent implements OnInit, OnDestroy {
         complete: () => this.loading.set(false),
       });
 
-    this.subscriptions.push(getBookSubscription);
-
-    /////////
-
-    const addBookSubscription = this.addToCartSubject
+    this.addToCartSubject
       .pipe(
         debounceTime(300),
         switchMap(({ bookId }) =>
@@ -65,20 +61,15 @@ export class BookDetailComponent implements OnInit, OnDestroy {
               complete: () => this.addBookLoading.set(false),
             })
           )
-        )
+        ),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
-
-    this.subscriptions.push(addBookSubscription);
   }
 
   onAddToCart(): void {
     this.addBookLoading.set(true);
     this.addToCartSubject.next({ bookId: this.book().id });
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 }
 

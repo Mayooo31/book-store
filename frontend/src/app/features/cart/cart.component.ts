@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { CartService } from '../../core/services/cart.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CartItemComponent } from './components/cart-item/cart-item.component';
@@ -11,7 +11,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { CartPaymentFormComponent } from './components/cart-payment-form/cart-payment-form.component';
-import { finalize, Subscription, switchMap, tap } from 'rxjs';
+import { finalize, switchMap, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-cart',
@@ -25,16 +26,15 @@ import { finalize, Subscription, switchMap, tap } from 'rxjs';
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css'],
 })
-export class CartComponent implements OnInit, OnDestroy {
+export class CartComponent implements OnInit {
   private authService = inject(AuthService);
   private cartService = inject(CartService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
   cart = this.cartService.cart;
   loading = signal<boolean>(true);
   checkoutLoading = signal<boolean>(false);
   error = signal<string>('');
-
-  private subscriptions: Subscription = new Subscription();
 
   form = new FormGroup({
     address: new FormControl('', {
@@ -47,19 +47,24 @@ export class CartComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
-      const cartSubscription = this.cartService.viewCart().subscribe({
-        error: (error) => {
-          this.loading.set(false);
-          this.error.set('Something happened... We could not fetch your cart.');
-        },
-        complete: () => this.loading.set(false),
-      });
-      this.subscriptions.add(cartSubscription);
+      this.cartService
+        .viewCart()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          error: () => {
+            this.loading.set(false);
+            this.error.set(
+              'Something happened... We could not fetch your cart.'
+            );
+          },
+          complete: () => this.loading.set(false),
+        });
     }
 
-    const creditCardSubscription = this.form
+    this.form
       .get('credit-card')
-      ?.valueChanges.subscribe((value) => {
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
         if (value !== null && typeof value === 'string') {
           const formattedValue = this.formatCreditCard(value);
           this.form
@@ -67,14 +72,6 @@ export class CartComponent implements OnInit, OnDestroy {
             ?.setValue(formattedValue, { emitEvent: false });
         }
       });
-
-    if (creditCardSubscription) {
-      this.subscriptions.add(creditCardSubscription);
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
   }
 
   private formatCreditCard(value: string): string {
@@ -97,7 +94,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
     if (!address || !creditCard) return;
 
-    const checkoutSubscription = this.cartService
+    this.cartService
       .checkout(address, creditCard)
       .pipe(
         switchMap((results) =>
@@ -107,11 +104,9 @@ export class CartComponent implements OnInit, OnDestroy {
             })
           )
         ),
-        finalize(() => this.checkoutLoading.set(false))
+        takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe();
-
-    this.subscriptions.add(checkoutSubscription);
+      .subscribe({ complete: () => this.checkoutLoading.set(false) });
   }
 
   isLoggedIn() {
@@ -123,10 +118,9 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   onRemoveAllBooksFromCart() {
-    const removeAllBooksSubscription = this.cartService
+    this.cartService
       .deleteAllBooksFromCart()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
-
-    this.subscriptions.add(removeAllBooksSubscription);
   }
 }

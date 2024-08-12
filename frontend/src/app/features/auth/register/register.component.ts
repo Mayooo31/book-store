@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 
 import { CommonModule } from '@angular/common';
 import { SharedAuthFormComponent } from '../shared-auth-form.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-register',
@@ -45,8 +46,9 @@ export class RegisterComponent {
     const { name, email, password } = this.form.value;
 
     if (name && email && password) {
-      const subscription = this.authService
+      this.authService
         .register(name, email, password)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           error: (error) => {
             this.loading.set(false);
@@ -57,8 +59,6 @@ export class RegisterComponent {
             this.router.navigate(['/login']);
           },
         });
-
-      this.destroyRef.onDestroy(() => subscription.unsubscribe());
     }
   }
 }
