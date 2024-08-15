@@ -74,6 +74,7 @@ export const searchBooks = (
 
   pool.query(searchByQueryParamsQuery, [`%${q}%`, limit], (error, results) => {
     if (error) {
+      console.log(error);
       return next(createError(500, "Error searching books"));
     }
 

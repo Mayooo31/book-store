@@ -14,6 +14,7 @@ const getBooks = (req, res, next) => {
     const offset = (+page - 1) * +limit;
     db_1.default.query(book_queries_1.getBooksQuery, [+limit, offset], (error, results) => {
         if (error) {
+            console.log(error);
             return next((0, error_1.default)(500, "Something went wrong. Could not fetch these books... 🤕"));
         }
         db_1.default.query("SELECT COUNT(*) FROM book", (countError, countResult) => {
