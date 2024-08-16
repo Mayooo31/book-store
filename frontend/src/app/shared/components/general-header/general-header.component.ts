@@ -1,10 +1,17 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  DestroyRef,
+} from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
 import { HeaderService } from '../../../core/services/header.service';
 import { CloseNavbarDirective } from '../../../core/directives/toggle-navbar.directive';
 import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-general-header',
@@ -13,13 +20,13 @@ import { Subscription } from 'rxjs';
   templateUrl: './general-header.component.html',
   styleUrls: ['../shared-header.component.css'],
 })
-export class GeneralHeaderComponent implements OnInit, OnDestroy {
+export class GeneralHeaderComponent implements OnInit {
   private authService = inject(AuthService);
   private cartService = inject(CartService);
   private headerService = inject(HeaderService);
+  private destroyRef = inject(DestroyRef);
   isOpenNavbar = this.headerService.isOpenNavbar;
   totalItemsInCart = this.cartService.totalItemsInCart;
-  private subscription: Subscription = new Subscription();
 
   onToggleNavbar() {
     this.headerService.toggleNavbar();
@@ -27,13 +34,11 @@ export class GeneralHeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.isLoggedIn()) {
-      const cartSubscription = this.cartService.viewCart().subscribe();
-      this.subscription.add(cartSubscription);
+      this.cartService
+        .viewCart()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe();
     }
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 
   isLoggedIn(): boolean {

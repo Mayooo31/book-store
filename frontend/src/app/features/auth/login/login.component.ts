@@ -42,7 +42,7 @@ export class LoginComponent {
 
     if (email && password) {
       this.authService
-        .login(email, password)
+        .login(email.toLowerCase(), password)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           error: (error) => {
