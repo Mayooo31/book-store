@@ -57,6 +57,9 @@ export class CartService {
         operation,
       })
       .pipe(
+        tap(() => {
+          this.toastr.success('Book added! 👌');
+        }),
         switchMap(() => this.viewCart()),
         catchError((error) => {
           this.toastr.error(

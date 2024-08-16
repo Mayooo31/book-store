@@ -50,6 +50,7 @@ const searchBooks = (req, res, next) => {
     const { q, page = "1", limit = "20" } = req.query;
     db_1.default.query(book_queries_1.searchByQueryParamsQuery, [`%${q}%`, limit], (error, results) => {
         if (error) {
+            console.log(error);
             return next((0, error_1.default)(500, "Error searching books"));
         }
         db_1.default.query("SELECT COUNT(*) FROM book WHERE title ILIKE $1 OR author ILIKE $1", [`%${q}%`], (countError, countResult) => {
