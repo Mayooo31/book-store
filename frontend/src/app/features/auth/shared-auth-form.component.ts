@@ -1,32 +1,57 @@
 import { Component, computed, input, output } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-shared-auth-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    MatInputModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule,
+  ],
   template: `
     <form class="form-container" [formGroup]="form()" (submit)="onSubmit()">
       <h1>{{ title() }}</h1>
 
-      @for(control of formControls(); track control){
-      <div>
-        <label [for]="control">{{ getLabel(control) }}:</label>
+      @for(control of formControls(); track control) {
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>{{ getLabel(control) }}</mat-label>
         <input
+          matInput
           [id]="control"
           [type]="getType(control)"
           [formControlName]="control"
         />
-        @if(getValidity(control)){
-        <p class="error">{{ getErrorMessage(control) }}</p>
+        @if(getValidity(control)) {
+        <mat-error>{{ getErrorMessage(control) }}</mat-error>
         }
-      </div>
-      } @if(error()){
-      <p class="error">{{ error() }}</p>
+      </mat-form-field>
       }
-      <button type="submit" [disabled]="loading()">
-        {{ loading() ? loadingMessage() : 'Submit' }}
+
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="loading()"
+        class="loading-button"
+      >
+        @if(!loading()) { Submit } @else {
+        <mat-progress-spinner
+          [diameter]="24"
+          mode="indeterminate"
+          color="accent"
+        ></mat-progress-spinner>
+        }
       </button>
+      @if(error()) {
+      <mat-error class="error">{{ error() }}</mat-error>
+      }
     </form>
   `,
   styleUrls: ['./shared-auth-form.component.css'],

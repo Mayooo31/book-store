@@ -13,6 +13,7 @@ import {
 import { provideToastr } from 'ngx-toastr';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -30,6 +31,6 @@ export const appConfig: ApplicationConfig = {
     provideToastr({
       timeOut: 4000,
       positionClass: 'toast-top-left',
-    }),
+    }), provideAnimationsAsync(), provideAnimationsAsync(),
   ],
 };

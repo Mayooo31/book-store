@@ -1,11 +1,4 @@
-import {
-  Component,
-  inject,
-  OnInit,
-  OnDestroy,
-  signal,
-  DestroyRef,
-} from '@angular/core';
+import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -20,13 +13,30 @@ import { BookService } from '../../books/book.service';
 import { Book } from '../../../types/types';
 import { minSelectedGenres } from '../../../validators';
 import { ToastrService } from 'ngx-toastr';
-import { pipe, Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-add-update-book',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCheckboxModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatIconModule,
+    MatSelectModule,
+  ],
   templateUrl: './add-update-book.component.html',
   styleUrls: ['./add-update-book.component.css'],
 })

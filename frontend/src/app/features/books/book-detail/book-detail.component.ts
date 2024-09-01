@@ -15,10 +15,25 @@ import { CartService } from '../../../core/services/cart.service';
 import { Book } from '../../../types/types';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 @Component({
   selector: 'app-book-detail',
   standalone: true,
-  imports: [CurrencyPipe],
+  imports: [
+    CurrencyPipe,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatGridListModule,
+    MatChipsModule,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './book-detail.component.html',
   styleUrls: ['./book-detail.component.css'],
 })

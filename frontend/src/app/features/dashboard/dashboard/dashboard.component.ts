@@ -4,10 +4,18 @@ import { DashboardService } from '../dashboard.service';
 import { CurrencyPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { MatCardModule } from '@angular/material/card'; // For using MatCard component
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [OrdersHistoryComponent, CurrencyPipe],
+  imports: [
+    OrdersHistoryComponent,
+    CurrencyPipe,
+    MatCardModule,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })

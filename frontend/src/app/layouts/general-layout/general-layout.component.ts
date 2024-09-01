@@ -7,8 +7,12 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
 @Component({
   selector: 'app-general-layout',
   standalone: true,
-  imports: [RouterOutlet, GeneralHeaderComponent, MainLayoutComponent,FooterComponent],
+  imports: [
+    RouterOutlet,
+    GeneralHeaderComponent,
+    MainLayoutComponent,
+    FooterComponent,
+  ],
   templateUrl: './general-layout.component.html',
-  styleUrl: './general-layout.component.css',
 })
 export class GeneralLayoutComponent {}

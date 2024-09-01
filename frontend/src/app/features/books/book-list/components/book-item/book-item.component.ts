@@ -16,10 +16,23 @@ import { AuthService } from '../../../../../core/services/auth.service';
 import { BookService } from '../../../book.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 @Component({
   selector: 'app-book-item',
   standalone: true,
-  imports: [CurrencyPipe],
+  imports: [
+    CurrencyPipe,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './book-item.component.html',
   styleUrls: ['./book-item.component.css'],
 })

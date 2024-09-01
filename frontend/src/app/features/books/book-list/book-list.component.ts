@@ -9,10 +9,25 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+
 @Component({
   selector: 'app-book-list',
   standalone: true,
-  imports: [CurrencyPipe, BookItemComponent, ReactiveFormsModule],
+  imports: [
+    CurrencyPipe,
+    BookItemComponent,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatPaginatorModule,
+    MatProgressSpinner,
+    MatIconModule,
+  ],
   templateUrl: './book-list.component.html',
   styleUrl: './book-list.component.css',
 })
@@ -23,7 +38,7 @@ export class BookListComponent implements OnInit {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   books = this.bookService.books;
-  page = signal<number>(1);
+  page = signal<number>(0);
   limit = signal<number>(20);
   paginationInfo = signal<PaginationInfo>({} as PaginationInfo);
   loading = signal<boolean>(true);
@@ -59,11 +74,6 @@ export class BookListComponent implements OnInit {
             this.page.set(+params['page'] || this.page());
             this.limit.set(+params['limit'] || this.limit());
 
-            if (this.page() < 1) {
-              this.page.set(1);
-              this.router.navigate(['books']);
-              return;
-            }
             this.onGetBooks();
           },
         }),
@@ -77,17 +87,12 @@ export class BookListComponent implements OnInit {
     this.loading.set(true);
 
     this.bookService
-      .getBooks(this.page(), this.limit())
+      .getBooks(this.page() + 1, this.limit())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (results) => {
           const { currentPage, totalPages, totalBooks } = results;
           this.paginationInfo.set({ currentPage, totalPages, totalBooks });
-
-          if (currentPage > totalPages) {
-            this.page.set(totalPages);
-            this.onNavigateToNewParams();
-          }
         },
         error: (error) => {
           this.error.set(error.error.message);
@@ -97,13 +102,12 @@ export class BookListComponent implements OnInit {
       });
   }
 
-  nextPage(): void {
-    this.page.update((prevPage) => prevPage + 1);
-    this.onNavigateToNewParams();
-  }
-
-  prevPage(): void {
-    this.page.update((prevPage) => prevPage - 1);
+  onChangePaginator(event: PageEvent) {
+    this.page.set(event.pageIndex);
+    this.limit.set(event.pageSize);
+    if (event.pageSize > this.paginationInfo().totalBooks) {
+      this.page.set(0);
+    }
     this.onNavigateToNewParams();
   }
 

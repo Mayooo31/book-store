@@ -4,13 +4,13 @@ import { Injectable, signal } from '@angular/core';
   providedIn: 'root',
 })
 export class HeaderService {
-  private isOpenNavbar_ = signal(false);
-  isOpenNavbar = this.isOpenNavbar_.asReadonly();
+  private isOpenSidebar_ = signal(false);
+  isOpenSidebar = this.isOpenSidebar_.asReadonly();
 
   closeNavbar() {
-    this.isOpenNavbar_.set(false);
+    this.isOpenSidebar_.set(false);
   }
   toggleNavbar() {
-    this.isOpenNavbar_.update((prev) => !prev);
+    this.isOpenSidebar_.update((prev) => !prev);
   }
 }

@@ -14,6 +14,5 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
     FooterComponent,
   ],
   templateUrl: './admin-layout.component.html',
-  styleUrl: './admin-layout.component.css',
 })
 export class AdminLayoutComponent {}

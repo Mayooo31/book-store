@@ -1,32 +1,48 @@
-<div class="book-item" (click)="onGetBookById(book().id)">
-  <div class="genres">
-    @for (genre of book().genres; track genre) {
-    <p>{{ genre }}</p>
-    }
-  </div>
-
+<mat-card class="card" (click)="onGetBookById(book().id)">
   <img
+    mat-card-image
     [src]="book().cover_image ? book().cover_image : 'assets/logo.png'"
     alt="{{ book().title }} cover image"
   />
 
   <div class="info">
-    <h3>{{ book().title }}</h3>
-    <p>by: {{ book().author }}</p>
-    <div class="price_stock">
-      <p>
-        Price: <span>{{ book().price | currency }}</span>
-      </p>
-      <p>{{ book().is_available ? "In stock" : "Out of stock" }}</p>
-    </div>
-    @if(isAdminManageBooks()){
+    <span class="space"></span>
+
+    @if(isAdminManageBooks()) {
     <div class="dashboard-buttons">
-      <button class="update" (click)="goToUpdatePage($event)">update</button>
-      <button class="delete" (click)="onDeleteBook($event)">delete</button>
+      <button
+        mat-raised-button
+        color="primary"
+        class="update"
+        (click)="goToUpdatePage($event)"
+      >
+        Update
+      </button>
+      <button
+        mat-raised-button
+        color="warn"
+        class="delete"
+        (click)="onDeleteBook($event)"
+      >
+        Delete
+      </button>
     </div>
-    }@else {
-    <button [disabled]="!book().is_available" (click)="onAddToCart($event)">
-      {{ loading() ? "ADDING..." : "ADD TO CART" }}</button
-    >}
+    } @else {
+    <button
+      mat-flat-button
+      color="accent"
+      class="add-to-cart"
+      [disabled]="!book().is_available"
+      (click)="onAddToCart($event)"
+    >
+      {{
+        loading()
+          ? "ADDING..."
+          : book().is_available
+          ? "ADD TO CART"
+          : "OUT OF STOCK"
+      }}
+    </button>
+    }
   </div>
-</div>
+</mat-card>

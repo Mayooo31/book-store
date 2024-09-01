@@ -2,14 +2,32 @@ import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../order.service';
 import { Router } from '@angular/router';
-import { OrdersHistoryItemComponent } from './components/orders-history-item/orders-history-item.component';
 import { DashboardService } from '../../dashboard/dashboard.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CapitalizePipe } from '../../../core/pipes/capitalize.pipe';
+
+import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-orders-history',
   standalone: true,
-  imports: [CommonModule, OrdersHistoryItemComponent],
+  imports: [
+    CommonModule,
+    CapitalizePipe,
+    MatCardModule,
+    MatTableModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatButtonModule,
+  ],
   templateUrl: './orders-history.component.html',
   styleUrls: ['./orders-history.component.css'],
 })
@@ -50,6 +68,13 @@ export class OrdersHistoryComponent implements OnInit {
           complete: () => this.loading.set(false),
         });
     }
+  }
+
+  onStatusChange(id: number, status: string) {
+    this.dashboardService
+      .changeStatusOfOrder(id, status)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   onGetOrderById(orderId: number): void {

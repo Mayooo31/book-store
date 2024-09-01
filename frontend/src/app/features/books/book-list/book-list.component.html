@@ -2,25 +2,25 @@
 
 <div class="pagination-info">
   <form [formGroup]="searchForm">
-    <input
-      placeholder="Search your book..."
-      name="search"
-      id="search"
-      formControlName="search"
-    />
+    <mat-form-field class="example-full-width">
+      <mat-label>Search your book...</mat-label>
+      <input matInput id="search" name="search" formControlName="search" />
+    </mat-form-field>
   </form>
   <p>
     Total Books: <span>{{ paginationInfo().totalBooks }}</span>
   </p>
-  @if(paginationInfo().totalBooks){ }
 </div>
 
 @if(loading()){
-<p class="main-loading">Loading...</p>
+<p class="main-loading"><mat-spinner></mat-spinner></p>
 }
 <!--  -->
 @else if(error()){
-<p class="main-error">{{ error() }}</p>
+<div class="error">
+  <mat-icon color="warn">error_outline</mat-icon>
+  <p>{{ error() }}</p>
+</div>
 }
 <!--  -->
 @else {
@@ -32,17 +32,14 @@
   }
 </div>
 
-<div class="pagination-buttons">
-  <button (click)="prevPage()" [disabled]="page() === 1">Previous</button>
-  <p>
-    Page <span>{{ paginationInfo().currentPage }}</span> of
-    <span>{{ paginationInfo().totalPages }}</span>
-  </p>
-  <button
-    (click)="nextPage()"
-    [disabled]="page() === paginationInfo().totalPages"
-  >
-    Next
-  </button>
-</div>
+<mat-paginator
+  class="paginator"
+  (page)="onChangePaginator($event)"
+  [length]="paginationInfo().totalBooks"
+  [pageSize]="limit()"
+  [pageIndex]="page()"
+  [pageSizeOptions]="[10, 20, 30]"
+  aria-label="Select page"
+>
+</mat-paginator>
 }

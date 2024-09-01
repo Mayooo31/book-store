@@ -1,66 +1,25 @@
-form {
-  max-width: 350px;
+.form-container {
+  max-width: 400px;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  margin: 0 auto;
 }
 
-form div {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.1rem;
+h1 {
+  font-size: 2.4rem;
 }
 
-form input {
-  font-size: 1.2rem;
-  font-weight: 600;
+.full-width {
+  width: 100%;
 }
 
-form input,
-form button {
-  background: #ffb9a7;
-  color: #428257;
-  padding: 0.4rem 0.8rem;
+.loading-button {
+  width: 100%;
   border-radius: 0.4rem;
-  border: 3px solid #ffb9a7;
-}
-
-form button:hover {
-  background: #f4ad9b;
-}
-
-form button:active {
-  background: #428257;
-  color: #ffb9a7;
-}
-
-form label {
-  text-align: left;
-}
-
-form button {
-  font-size: 1.4rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  padding: 1rem;
 }
 
 .error {
-  color: #ed7c74;
-  text-align: left;
-  font-size: 1rem;
-}
-
-form div:has(.ng-invalid.ng-touched.ng-dirty) label {
-  color: #ed7c74;
-}
-
-input.ng-invalid.ng-touched.ng-dirty,
-textarea.ng-invalid.ng-touched.ng-dirty {
-  background-color: #ed7c74;
-}
-
-/* //////////////// */
-
-@media (max-width: 640px) {
-  form {
-    max-width: 95%;
-  }
+  padding-top: 1rem;
 }

@@ -5,30 +5,32 @@
   margin-bottom: 1.6rem;
 }
 
-.pagination-info input {
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 0.6rem;
-  background-color: #428257;
-  color: #ffb9a7;
-}
-
 .pagination-info p span {
   font-weight: 700;
 }
 
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 2rem 1rem;
+  justify-items: center;
+}
+
+.main-loading,
+.error {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  margin: 20px;
+  text-align: center;
+  height: 200px;
+  color: rgb(207, 60, 60);
 }
 
 .empty {
   grid-column: -1/1;
-  font-size: 1.6rem;
-  font-weight: 600;
+  font-size: 1.4rem;
   margin: 2rem 0rem;
 }
 
@@ -66,24 +68,44 @@
   font-weight: 700;
 }
 
+.title {
+  font-size: 3rem;
+  font-weight: 500;
+}
+
+.paginator {
+  background-color: transparent;
+  margin-top: 0.6rem;
+}
+
 @media (max-width: 1300px) {
   .books-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1000px) {
+  .books-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 800px) {
   .books-grid {
-    grid-template-columns: repeat(1, 80%);
-  }
-}
-
-@media (max-width: 640px) {
-  .books-grid {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
   .pagination-info input {
     padding: 10px 10px;
     width: 200px;
+  }
+  .title {
+    font-size: 2.2rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .books-grid {
+    gap: 1rem 0rem;
   }
 }

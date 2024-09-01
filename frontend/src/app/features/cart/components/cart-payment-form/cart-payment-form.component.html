@@ -1,24 +1,27 @@
 <form [formGroup]="form()" (submit)="onSubmit()">
-  <div>
-    <label for="address">Address:</label>
-    @if(getValidity('address')){
-    <p class="error">Address has to be at least 6 characters long.</p>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Address</mat-label>
+    <input matInput id="address" formControlName="address" />
+    @if(getValidity('address')) {
+    <mat-error> Address has to be at least 6 characters long. </mat-error>
     }
-    <input type="text" id="address" formControlName="address" />
-  </div>
-  <div>
-    <label for="credit-card">Credit card:</label>
-    @if(getValidity('credit-card')){
-    <p class="error">Card must have 16 digits.</p>
-    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Credit card</mat-label>
     <input
+      matInput
       placeholder="3482-****-7536-1692"
       type="text"
       id="credit-card"
       formControlName="credit-card"
     />
-  </div>
-  <button class="pay-button">
+    @if(getValidity('credit-card')) {
+    <mat-error> Card must have 16 digits. </mat-error>
+    }
+  </mat-form-field>
+
+  <button mat-flat-button color="primary" class="pay-button" type="submit">
     {{ checkoutLoading() ? "Ordering..." : "Pay & order" }}
   </button>
 </form>

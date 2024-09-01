@@ -1,45 +1,73 @@
-@if(loading()){
-<p class="main-loading">Loading...</p>
-} @else if(error()){
-<p class="main-error">{{ error() }}</p>
-} @else {
-<h1>Order number. {{ order().order_id }}</h1>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Order number: {{ order().order_id }}</mat-card-title>
+  </mat-card-header>
 
-<div class="order">
-  <div class="status-created">
-    <p>
-      Status: <span>{{ order().status | capitalize }}</span>
-    </p>
-    <p>
-      Ordered: <span>{{ order().created_at | date : "short" }}</span>
-    </p>
-  </div>
+  <mat-card-content>
+    @if (loading()) {
+    <div class="main-loading">
+      <mat-spinner></mat-spinner>
+    </div>
+    } @else if (error()) {
+    <div class="error">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+    } @else {
+    <div class="info">
+      <p>
+        <strong>Status:</strong> <span>{{ order().status | capitalize }}</span>
+      </p>
+      <p>
+        <strong>Ordered:</strong>
+        <span>{{ order().created_at | date : "short" }}</span>
+      </p>
+      <p>
+        <strong>Payment:</strong> <span>{{ order().payment }}</span>
+      </p>
+      <p>
+        <strong>Total price:</strong>
+        <span>{{ order().total_price | currency }}</span>
+      </p>
+    </div>
 
-  <h2>Ordered items:</h2>
-  <table>
-    <tr>
-      <th>Book id</th>
-      <th>Title</th>
-      <th>Price</th>
-      <th>Quantity</th>
-    </tr>
-    @for (item of order().items; track item.book_id){
-    <tr>
-      <td>{{ item.book_id }}</td>
-      <td class="title-small">{{ item.title }}</td>
-      <td>{{ item.price }}</td>
-      <td>{{ item.quantity }}</td>
-    </tr>
+    <div class="table-container">
+      <table mat-table [dataSource]="order().items" class="table">
+        <ng-container matColumnDef="book_id">
+          <th mat-header-cell *matHeaderCellDef>Book ID</th>
+          <td mat-cell *matCellDef="let item">{{ item.book_id }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Title</th>
+          <td mat-cell *matCellDef="let item" class="title-small">
+            {{ item.title }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef>Price</th>
+          <td mat-cell *matCellDef="let item">{{ item.price | currency }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef>Quantity</th>
+          <td mat-cell *matCellDef="let item">{{ item.quantity }}</td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="['book_id', 'title', 'price', 'quantity']"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="
+            let row;
+            columns: ['book_id', 'title', 'price', 'quantity']
+          "
+        ></tr>
+      </table>
+    </div>
     }
-  </table>
-  <div class="payment-price">
-    <p>
-      Payment: <span>{{ order().payment }}</span>
-    </p>
-    <p>
-      Total price <span>{{ order().total_price | currency }}</span>
-    </p>
-  </div>
-</div>
-
-}
+  </mat-card-content>
+</mat-card>

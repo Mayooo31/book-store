@@ -1,76 +1,161 @@
-<h1 class="title">Your cart!</h1>
-
-@if(isLoggedIn()){
-<!--  -->
-@if(loading()){
-<p class="main-loading">Loading...</p>
-}
-<!--  -->
-@else if(error()){
-<p class="main-error">{{ error() }}</p>
-}
-<!--  -->
-@else {
-<div class="cart">
-  <!--  -->
-  @if(cart().items.length === 0){
-  <div class="no-items">
-    <span class="material-symbols-outlined"> shopping_cart </span>
-    <h2>No items in cart... Add something :)</h2>
-  </div>
-  }
-  <!--  -->
-  @else {
-  <table>
-    <tr class="titles">
-      <th>Book id</th>
-      <th>Cover img</th>
-      <th>Title</th>
-      <th>Price</th>
-      <th>Quantity</th>
-      <th>Subtotal</th>
-    </tr>
-    @for (item of cart().items; track item.book_id){
-    <tr
-      class="tr-item"
-      app-cart-item
-      [item]="item"
-      (click)="onGetBookById(item.book_id)"
-    ></tr>
-    }
-  </table>
-  <div class="delete-books-icon">
-    <span
-      (click)="onRemoveAllBooksFromCart()"
-      class="material-symbols-outlined"
-    >
-      delete
-    </span>
-  </div>
-  <div class="line"></div>
-  <div class="billing-address">
-    <app-cart-payment-form
-      [checkoutLoading]="checkoutLoading()"
-      [form]="form"
-      (formSubmit)="onCheckout()"
-    />
-    <div class="billing-summary">
-      <p>
-        Subtotal: <span>{{ this.cart().subtotal_price | currency }}</span>
-      </p>
-      <p>
-        Fees: <span>{{ this.cart().service_fee | currency }}</span>
-      </p>
-      <p>
-        Shipping: <span>{{ this.cart().shipping | currency }}</span>
-      </p>
-      <p class="total">
-        Total: <span>{{ this.cart().total_price | currency }}</span>
-      </p>
+<mat-card class="cart-card">
+  <mat-card-header>
+    <mat-card-title>Your Cart</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (isLoggedIn()) { @if (loading()) {
+    <div class="main-loading">
+      <mat-spinner></mat-spinner>
     </div>
-  </div>
-  }
-</div>
-} } @else {
-<p class="error">Log in and you will see your cart... :)</p>
-}
+    } @else if (error()) {
+    <div class="error">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+    } @else {
+    <div class="cart">
+      @if (cart().items.length === 0) {
+      <div class="no-items">
+        <mat-icon>shopping_cart</mat-icon>
+        <h5>No items in cart... Add something :)</h5>
+      </div>
+      } @else {
+      <div class="table-container">
+        <table mat-table [dataSource]="cart().items" class="table">
+          <ng-container matColumnDef="book_id">
+            <th mat-header-cell *matHeaderCellDef>Book ID</th>
+            <td mat-cell *matCellDef="let item">{{ item.book_id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="cover_image">
+            <th mat-header-cell *matHeaderCellDef>Cover Image</th>
+            <td mat-cell *matCellDef="let item">
+              <img [src]="item.cover_image" alt="" class="cover-img" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Title</th>
+            <td mat-cell *matCellDef="let item">{{ item.title }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef>Price</th>
+            <td mat-cell *matCellDef="let item">{{ item.price | currency }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef>Quantity</th>
+            <td mat-cell *matCellDef="let item">
+              <mat-select
+                [value]="item.quantity"
+                (selectionChange)="
+                  onSelectionChange($event.value, item.book_id)
+                "
+              >
+                @for (q of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track q) {
+
+                <mat-option [value]="q">
+                  {{ q }}
+                </mat-option>
+                }
+              </mat-select>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="subtotal">
+            <th mat-header-cell *matHeaderCellDef>Subtotal</th>
+            <td mat-cell *matCellDef="let item">
+              {{ +item.price * +item.quantity | currency }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let item" class="icon">
+              <mat-icon (click)="onDeleteBook($event, item.book_id)"
+                >delete</mat-icon
+              >
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="[
+              'book_id',
+              'cover_image',
+              'title',
+              'price',
+              'quantity',
+              'subtotal',
+              'actions'
+            ]"
+          ></tr>
+          <tr
+            mat-row
+            *matRowDef="
+              let row;
+              columns: [
+                'book_id',
+                'cover_image',
+                'title',
+                'price',
+                'quantity',
+                'subtotal',
+                'actions'
+              ]
+            "
+          ></tr>
+        </table>
+      </div>
+      <!-- Delete All Books -->
+      <div class="delete-all">
+        <button
+          mat-flat-button
+          color="warn"
+          (click)="onRemoveAllBooksFromCart()"
+        >
+          Remove all
+        </button>
+      </div>
+      <mat-divider></mat-divider>
+      <!-- Billing Section -->
+
+      <mat-card class="payment-card">
+        <mat-card-header>
+          <mat-card-title>Payment:</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="billing-address">
+            <div class="billing-summary">
+              <p>
+                Subtotal: <span>{{ cart().subtotal_price | currency }}</span>
+              </p>
+              <p>
+                Fees: <span>{{ cart().service_fee | currency }}</span>
+              </p>
+              <p>
+                Shipping: <span>{{ cart().shipping | currency }}</span>
+              </p>
+              <p class="total">
+                Total: <span>{{ cart().total_price | currency }}</span>
+              </p>
+            </div>
+            <app-cart-payment-form
+              [checkoutLoading]="checkoutLoading()"
+              [form]="form"
+              (formSubmit)="onCheckout()"
+            ></app-cart-payment-form>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      }
+    </div>
+    } } @else {
+    <div class="no-items">
+      <mat-icon>shopping_cart</mat-icon>
+      <h5>Log in and you will see your cart... :)</h5>
+    </div>
+    }
+  </mat-card-content>
+</mat-card>

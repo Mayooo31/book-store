@@ -1,45 +1,96 @@
-@if(isOnDashboard) {
-<h1 class="title">Last 30 orders!</h1>
-}
-<!--  -->
-@else {
-<h1 class="title">Your orders history!</h1>
-}
-<!--  -->
-@if(loading()){
-<p class="main-loading">Loading...</p>
-}
-<!--  -->
-@else if(error()){
-<p class="main-error">{{ error() }}</p>
-}
-<!--  -->
-@else {
-<div class="orders">
-  @if(orders().length === 0){
-  <div class="no-items">
-    <span class="material-symbols-outlined"> shopping_cart </span>
-    <h2>No orders yet... Order something :)</h2>
-  </div>
-  }
-  <!--  -->
-  @else {
-  <table>
-    <tr class="titles">
-      <th>Order id</th>
-      <th>Status</th>
-      <th>Price</th>
-      <th>Ordered at</th>
-    </tr>
-    @for (order of orders(); track order.id){
-    <tr
-      [isOnDashboard]="isOnDashboard"
-      app-orders-history-item
-      [order]="order"
-      (click)="onGetOrderById(order.id)"
-    ></tr>
+<mat-card>
+  <mat-card-header>
+    @if (isOnDashboard) {
+    <mat-card-title>Last 30 orders!</mat-card-title>
+    } @else {
+    <mat-card-title>Your orders history!</mat-card-title>
     }
-  </table>
-  }
-</div>
-}
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (loading()) {
+    <div class="main-loading">
+      <mat-spinner></mat-spinner>
+    </div>
+    } @else if (error()) {
+    <div class="error">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+    } @else {
+    <div class="orders">
+      @if (orders().length === 0) {
+      <div class="no-items">
+        <mat-icon class="no-orders-icon">shopping_cart</mat-icon>
+        <h2>No orders yet... Order something :)</h2>
+      </div>
+      } @else {
+      <div class="table-container">
+        <table mat-table [dataSource]="orders()" class="table">
+          <ng-container matColumnDef="order_id">
+            <th mat-header-cell *matHeaderCellDef>Order ID</th>
+            <td mat-cell *matCellDef="let order">{{ order.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let order">
+              @if (isOnDashboard) {
+              <mat-select
+                (click)="$event.stopPropagation()"
+                [value]="order.status"
+                (selectionChange)="onStatusChange(order.id, $event.value)"
+              >
+                <mat-option value="processing">Processing</mat-option>
+                <mat-option value="pending">Pending</mat-option>
+                <mat-option value="shipped">Shipped</mat-option>
+                <mat-option value="delivered">Delivered</mat-option>
+                <mat-option value="cancelled">Cancelled</mat-option>
+                <mat-option value="returned">Returned</mat-option>
+                <mat-option value="refunded">Refunded</mat-option>
+                <mat-option value="failed">Failed</mat-option>
+              </mat-select>
+              } @else {
+              {{ order.status | capitalize }}
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="total_price">
+            <th mat-header-cell *matHeaderCellDef>Price</th>
+            <td mat-cell *matCellDef="let order">
+              {{ order.total_price | currency }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="ordered_at">
+            <th mat-header-cell *matHeaderCellDef>Ordered at</th>
+            <td mat-cell *matCellDef="let order">
+              {{ order.created_at | date : "short" }}
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="[
+              'order_id',
+              'status',
+              'total_price',
+              'ordered_at'
+            ]"
+          ></tr>
+          <tr
+            mat-row
+            *matRowDef="
+              let row;
+              columns: ['order_id', 'status', 'total_price', 'ordered_at']
+            "
+            (click)="onGetOrderById(row.id)"
+          ></tr>
+        </table>
+      </div>
+      }
+    </div>
+    }
+  </mat-card-content>
+</mat-card>

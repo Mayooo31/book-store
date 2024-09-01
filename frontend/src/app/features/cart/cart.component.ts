@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { CartService } from '../../core/services/cart.service';
 import { AuthService } from '../../core/services/auth.service';
-import { CartItemComponent } from './components/cart-item/cart-item.component';
 import { Router } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
 import {
@@ -11,17 +10,35 @@ import {
   Validators,
 } from '@angular/forms';
 import { CartPaymentFormComponent } from './components/cart-payment-form/cart-payment-form.component';
-import { finalize, switchMap, tap } from 'rxjs';
+import { switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatOptionModule } from '@angular/material/core';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
   imports: [
-    CartItemComponent,
     CurrencyPipe,
     ReactiveFormsModule,
     CartPaymentFormComponent,
+    MatCardModule,
+    MatTableModule,
+    MatIconModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule,
+    MatDividerModule,
+    MatOptionModule,
+    MatButtonModule,
   ],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css'],
@@ -120,6 +137,21 @@ export class CartComponent implements OnInit {
   onRemoveAllBooksFromCart() {
     this.cartService
       .deleteAllBooksFromCart()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+  }
+
+  onDeleteBook(event: Event, bookId: number): void {
+    event.stopPropagation();
+    this.cartService
+      .deleteBook(bookId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+  }
+
+  onSelectionChange(changedQuantity: number, bookId: number) {
+    this.cartService
+      .addBook(bookId, changedQuantity, 'set')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
   }

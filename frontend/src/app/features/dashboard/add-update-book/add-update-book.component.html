@@ -1,76 +1,86 @@
-@if(isUpdating){
-<h1 class="title">Update a book</h1>
-} @else {
-<h1 class="title">Add a book</h1>
-}
-
 <form class="form-container" [formGroup]="bookForm" (ngSubmit)="onSubmit()">
-  <div class="form-item" [ngClass]="{ invalid: getValidity('title') }">
-    <label for="title">Title:</label>
-    <input id="title" formControlName="title" />
+  @if(isUpdating){
+  <h1>Update a book</h1>
+  } @else {
+  <h1>Add a book</h1>
+  }
+  <!-- Title Input Group -->
+  <mat-form-field class="form-item" appearance="fill">
+    <mat-label>Title</mat-label>
+    <input matInput id="title" formControlName="title" />
     @if(getValidity('title')){
-    <p class="error">Title is required</p>
+    <mat-error>Title is required</mat-error>
     }
-  </div>
+  </mat-form-field>
 
   <!-- Author Input Group -->
-  <div class="form-item" [ngClass]="{ invalid: getValidity('author') }">
-    <label for="author">Author:</label>
-    <input id="author" formControlName="author" />
+  <mat-form-field class="form-item" appearance="fill">
+    <mat-label>Author</mat-label>
+    <input matInput id="author" formControlName="author" />
     @if(getValidity('author')){
-    <p class="error">Author is required</p>
+    <mat-error>Author is required</mat-error>
     }
-  </div>
+  </mat-form-field>
 
   <!-- Description Input Group -->
-  <div class="form-item" [ngClass]="{ invalid: getValidity('description') }">
-    <label for="description">Description:</label>
-    <textarea id="description" formControlName="description"></textarea>
+  <mat-form-field class="form-item" appearance="fill">
+    <mat-label>Description</mat-label>
+    <textarea
+      matInput
+      id="description"
+      formControlName="description"
+    ></textarea>
     @if(getValidity('description')){
-    <p class="error">Description needs to have at least 50 characters.</p>
+    <mat-error>Description needs to have at least 50 characters.</mat-error>
     }
-  </div>
+  </mat-form-field>
 
   <!-- Price Input Group -->
-  <div class="form-item" [ngClass]="{ invalid: getValidity('price') }">
-    <label for="price">Price:</label>
-    <input id="price" type="number" formControlName="price" />
+  <mat-form-field class="form-item" appearance="fill">
+    <mat-label>Price</mat-label>
+    <input matInput id="price" type="number" formControlName="price" />
     @if(getValidity('price')){
-    <p class="error">Minimum price is $5.00.</p>
+    <mat-error>Minimum price is $5.00.</mat-error>
     }
-  </div>
+  </mat-form-field>
 
   <!-- Year Published Input Group -->
-  <div class="form-item" [ngClass]="{ invalid: getValidity('yearPublished') }">
-    <label for="yearPublished">Year Published:</label>
-    <input id="yearPublished" type="number" formControlName="yearPublished" />
+  <mat-form-field class="form-item" appearance="fill">
+    <mat-label>Year Published</mat-label>
+    <input
+      matInput
+      id="yearPublished"
+      type="number"
+      formControlName="yearPublished"
+    />
     @if(getValidity('yearPublished')){
-    <p class="error">Year must be 1900 or later</p>
+    <mat-error>Year must be 1900 or later</mat-error>
     }
-  </div>
+  </mat-form-field>
 
   <!-- Cover Image URL Input Group -->
-  <div class="form-item" [ngClass]="{ invalid: getValidity('coverImage') }">
-    <label for="coverImage">Cover Image URL:</label>
-    <input id="coverImage" formControlName="coverImage" />
+  <mat-form-field class="form-item" appearance="fill">
+    <mat-label>Cover Image URL</mat-label>
+    <input matInput id="coverImage" formControlName="coverImage" />
     @if(getValidity('coverImage')){
-    <p class="error">Cover image URL is required</p>
+    <mat-error>Cover image URL is required</mat-error>
     }
-  </div>
+  </mat-form-field>
 
   <!-- Pages Input Group -->
-  <div class="form-item" [ngClass]="{ invalid: getValidity('pages') }">
-    <label for="pages">Pages:</label>
-    <input id="pages" type="number" formControlName="pages" />
+  <mat-form-field class="form-item" appearance="fill">
+    <mat-label>Pages</mat-label>
+    <input matInput id="pages" type="number" formControlName="pages" />
     @if(getValidity('pages')){
-    <p class="error">Pages must be at least 1</p>
+    <mat-error>Pages must be at least 1</mat-error>
     }
-  </div>
+  </mat-form-field>
 
   <!-- Rating Input Group -->
-  <div class="form-item" [ngClass]="{ invalid: getValidity('rating') }">
-    <label for="rating">Rating:</label>
+  <mat-form-field class="form-item" appearance="fill">
+    <mat-label>Rating</mat-label>
     <input
+      matInput
       id="rating"
       type="number"
       step="0.1"
@@ -79,38 +89,37 @@
       formControlName="rating"
     />
     @if(getValidity('rating')){
-    <p class="error">Rating must be between 0 and 5</p>
+    <mat-error>Rating must be between 0 and 5</mat-error>
     }
-  </div>
+  </mat-form-field>
 
   <!-- Is Available Input Group -->
   <div class="form-item checkbox">
-    <label for="isAvailable">Is Available:</label>
-    <label class="container">
-      <input id="isAvailable" type="checkbox" formControlName="isAvailable" />
-      <span class="checkmark"></span>
-    </label>
+    <mat-checkbox id="isAvailable" formControlName="isAvailable"
+      >Is Available</mat-checkbox
+    >
   </div>
 
+  <!-- Genres Input Group -->
   <div class="form-item">
-    <label>Genres:</label>
-    @if(bookForm.get('genres')?.invalid){
-    <p class="error">Must select between 1 and 3 genres.</p>
-    }
-    <div class="genres">
+    <label class="label-genres">Genres:</label>
+    <mat-chip-set class="genres">
       @for (genre of genres(); track genre.id) {
-      <div
+      <mat-chip
         (click)="toggleGenre(genre.id)"
         [ngClass]="{ 'selected-genre': isGenreSelected(genre.id) }"
         class="genre-item"
       >
         {{ genre.genre }}
-      </div>
+      </mat-chip>
       }
-    </div>
+    </mat-chip-set>
+    @if(bookForm.get('genres')?.invalid){
+    <mat-error>Must select between 1 and 3 genres.</mat-error>
+    }
   </div>
 
-  <button type="submit">
+  <button mat-flat-button color="primary" type="submit">
     {{ loading() ? "Loading..." : isUpdating ? "Update a book" : "Add a book" }}
   </button>
 </form>

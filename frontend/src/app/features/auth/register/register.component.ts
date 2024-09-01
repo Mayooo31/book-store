@@ -47,7 +47,7 @@ export class RegisterComponent {
 
     if (name && email && password) {
       this.authService
-        .register(name, email, password)
+        .register(name, email.toLowerCase(), password)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           error: (error) => {

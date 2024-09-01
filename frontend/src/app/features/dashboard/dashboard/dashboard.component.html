@@ -1,43 +1,44 @@
-<h1 class="title">Statistics for last month</h1>
+<h1 class="title">Overview</h1>
 
-@if(loading()) {
-<p class="main-loading">Loading...</p>
-}
-<!--  -->
-@else if(error()) {
-<p>{{ error() }}</p>
-}
-<!--  -->
-@else {
 <div class="statistics">
-  <div>
-    <h2>Orders</h2>
-    <p>
-      <span>{{ statistics().number_of_orders_last_month }}</span>
-      orders
-    </p>
-  </div>
-  <div>
-    <h2>Customers</h2>
-    <p>
-      <span>{{ statistics().number_of_customers_last_month }}</span>
-      customers
-    </p>
-  </div>
-  <div>
-    <h2>Books in database</h2>
-    <p>
-      <span>{{ statistics().total_books_count }}</span>
-      books
-    </p>
-  </div>
-  <div>
-    <h2>Profit from sales</h2>
-    <p>
-      <span>{{ statistics().total_sales_last_month | currency }}</span>
-    </p>
-  </div>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Last Month's Statistics</mat-card-title>
+    </mat-card-header>
+    <br />
+    <mat-card-content>
+      @if(loading()) {
+      <div class="loading-container">
+        <mat-spinner></mat-spinner>
+      </div>
+      }
+      <!--  -->
+      @else if(error()) {
+      <div class="error">
+        <p>{{ error() }}</p>
+      </div>
+      }
+      <!--  -->
+      @else {
+      <div class="stat-item">
+        <strong>Orders:</strong>
+        <span>{{ statistics().number_of_orders_last_month }}</span>
+      </div>
+      <div class="stat-item">
+        <strong>Customers:</strong>
+        <span>{{ statistics().number_of_customers_last_month }}</span>
+      </div>
+      <div class="stat-item">
+        <strong>Books in database:</strong>
+        <span>{{ statistics().total_books_count }}</span>
+      </div>
+      <div class="stat-item">
+        <strong>Profit from sales:</strong>
+        <span>{{ statistics().total_sales_last_month | currency }}</span>
+      </div>
+      }
+    </mat-card-content>
+  </mat-card>
 </div>
-}
 
 <app-orders-history />

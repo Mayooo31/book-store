@@ -1,29 +1,35 @@
-@if(loading()){
-<p class="main-loading">Loading...</p>
-} @else if(error()){
-<p class="main-error">{{ error() }}</p>
-} @else {
-<h1 class="title">{{ book().title }}</h1>
-
-<div class="book">
-  <div class="genres">
-    @for (genre of book().genres; track genre) {
-    <p>{{ genre }}</p>
-    }
+<mat-card class="book-card">
+  @if (loading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
   </div>
-
-  <div>
+  } @else if (error()) {
+  <div class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p class="main-error">{{ error() }}</p>
+  </div>
+  } @else {
+  <mat-card-header class="header">
+    <div class="rating">
+      <p>{{ book().rating }}</p>
+      <mat-icon aria-hidden="false">star</mat-icon>
+    </div>
     <img
+      mat-card-avatar
       [src]="book() ? book().cover_image : 'assets/logo.png'"
       alt="{{ book().title }} cover image"
+      class="book-cover"
     />
-  </div>
+    <mat-card-title class="title">{{ book().title }}</mat-card-title>
+    <mat-card-subtitle class="author"
+      >by: {{ book().author }}
+    </mat-card-subtitle>
+  </mat-card-header>
 
-  <div class="info">
-    <div class="info-top">
-      <h2>by: {{ book().author }}</h2>
-      <p class="description">Overview: {{ book().description }}</p>
-      <div class="pages_year">
+  <mat-card-content>
+    <div class="info">
+      <p class="description"><span>Overview:</span> {{ book().description }}</p>
+      <div class="pages-year">
         <p>
           Pages: <span>{{ book().pages }}</span>
         </p>
@@ -31,23 +37,34 @@
           Published: <span>{{ book().year_published }}</span>
         </p>
       </div>
-      <p class="rating">
-        {{ book().rating }}
-        <span class="material-symbols-outlined star"> star </span>
-      </p>
-    </div>
-    <div class="info-bottom">
-      <div class="price_stock">
-        <p>{{ book().is_available ? "In stock" : "Out of stock" }}</p>
-        <p>
-          Price: <span>{{ book().price | currency }}</span>
-        </p>
+      <div class="chip-container">
+        <mat-chip-set aria-label="Book genres">
+          @for (genre of book().genres; track genre) {
+          <mat-chip color="primary">{{ genre }}</mat-chip>
+          }
+        </mat-chip-set>
       </div>
-      <button (click)="onAddToCart()" [disabled]="!book().is_available">
-        {{ addBookLoading() ? "ADDING..." : "ADD TO CART" }}
-      </button>
     </div>
-  </div>
-</div>
+  </mat-card-content>
 
-}
+  <mat-card-actions class="actions">
+    <p>
+      Price: <span>{{ book().price | currency }}</span>
+    </p>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="onAddToCart()"
+      [disabled]="!book().is_available"
+    >
+      {{
+        addBookLoading()
+          ? "ADDING..."
+          : book().is_available
+          ? "ADD TO CART"
+          : "Out of stock"
+      }}
+    </button>
+  </mat-card-actions>
+  }
+</mat-card>
